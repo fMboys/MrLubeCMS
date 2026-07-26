@@ -1,0 +1,39 @@
+﻿@{
+    ViewData["Title"] = "Promo Images";
+
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1>Promo Images</h1>
+<div class="card mb-3">
+    <div class="text-center d-block p-3 card-footer">
+        <button type="button" name="AddPromoImage" class="btn-pill btn-shadow btn-wide fsize-1 btn btn-primary btn-lg" onclick="AddNewItem()">
+            <span class="mr-2 opacity-7">
+                <i class="fa fa-plus"></i>
+            </span>
+            <span class="mr-1">Add New Item</span>
+        </button>
+    </div>
+    <div class="card-body">
+        <table id="tblPromoImage" style="width:100%;overflow-wrap:anywhere;" class="table table-hover table-striped table-bordered" cellspacing="0" width="100%">
+            <thead>
+                <tr> 
+                    <th style="width: 20%">Title</th>
+                    <th style="width: 20%">Image</th>
+                    <th style="width: 10%">Device</th>
+                    <th style="width: 20%">Page</th>
+                    <th style="width: 10%">Status</th>
+                    <th style="width: 10%">Language</th>
+                    <th style="width: 10%">Action</th>
+                </tr>
+            </thead>
+
+            <tbody></tbody>
+        </table>
+    </div>
+</div>
+
+<script src="~/assets/js/jquery-3.3.1.min.js"></script>
+<script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+<script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+<script src="~/assets/scripts/PromoImage.js"></script> 

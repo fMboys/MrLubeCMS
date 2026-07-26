@@ -1,0 +1,318 @@
+﻿@model CMS.Core.Entities.banners;
+@inject IConfiguration _configuration;
+@using static IWebHostEnvironment
+@{
+    var AzureBlob = _configuration.GetSection("AzureBlob").Value;
+    var bannerpath = "/img/banners/";
+    var mwidth = ViewBag.mwidth;
+    var mheight = ViewBag.mheight;
+    var dwidth = ViewBag.dwidth;
+    var dheight = ViewBag.dheight;
+    //int bannerCount = Convert.ToInt32(ViewBag.BannerCount) + 1;
+    //var img = TempData["mainimg"];
+    //Layout = null;
+}
+@*<link rel="stylesheet" href="~/css/toastr.css">*@
+@*<link rel="stylesheet" href="~/css/custom.css">
+<link rel="stylesheet" href="~/css/main.8d288f825d8dffbbe55e.css">*@
+<div class="modal-dialog" role="document">
+    <div class="modal-content">
+        <form asp-action="Banner" class="" id="bannerupload" method="post" enctype="multipart/form-data">
+            <div class="modal-header">
+                <h5 class="modal-title" id="bannerModalLabel">@ViewBag.Title Home Page Banner</h5>
+                <button id="bannerModalbutton" data-dismiss="modal" type="button" class="close" aria-label="Close" aria-hidden="true" onclick="closeModal();">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+
+                @{
+                    <input id="hdnStaggingDomain" type="hidden" value="@_configuration["StagingDomain"]" />
+                    <input id="hdnProdDomain" type="hidden" value="@_configuration["ProdDomain"]" />
+                }
+                <div class="row">
+                    <div class="col-md-6">
+                        @{
+                            @if (@Model.image != null)
+                            {
+                                if (@Model.view == "desktop")
+                                {
+                                    <div style="display:block; margin-bottom:5px;text-align:center;">
+                                        <img src="@Url.Content(AzureBlob + bannerpath + @Model.image)" class="" style="height:120px; width:95%;" asp-append-version="true" />
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div style="display:block; margin-bottom:5px;text-align:center;">
+                                        <img src="@Url.Content(AzureBlob + bannerpath + @Model.image)" class="" style="height:90%; width:30%;" asp-append-version="true" />
+                                    </div>
+                                }
+
+                            }
+                        }
+                    </div>
+                    <div class="col-md-6">
+
+                        @{
+                            if (ViewBag.Title == "Edit")
+                            {
+                                <label for="@Model.image" class="">Uploaded Banner Image File Name</label>
+                                <input for="@Model.image" type="text" name="imgfileName" id="imgfileName" class="form-control" value="@Model.image" disabled>
+                            }
+                            <input for="@ViewBag.Title" type="hidden" name="formMode" id="formMode" class="form-control-file" value="@ViewBag.Title">
+                            <input for="@Model.image" type="hidden" name="imgupd" id="imgupd" class="form-control-file" value="@Model.image">
+                            <input for="@Model.guid" type="hidden" name="img_guid" id="img_guid" class="form-control-file" value="@Model.guid">
+                            <input asp-for="@Model.banner_id" type="hidden" name="bannerId" id="bannerId" class="form-control-file" value="@Model.banner_id">
+                        }
+                    </div>
+                </div>
+                <div class="row">
+
+                    <div class="form-group col-md-6">
+                        <div class="position-relative form-group">
+                            <label for="viewSelect" class="">Select View</label>
+                            @{
+                                if (ViewBag.Title == "Edit")
+                                {
+                                    <select asp-for="@Model.view" name="viewSelect" id="viewSelect" class="form-control" readonly onchange="toggleHintText();">
+                                        <option selected>@Model.view</option>
+                                        @*<option>Mobile</option>*@
+
+                                    </select>
+                                }
+                                else
+                                {
+                                    <select asp-for="@Model.view" name="viewSelect" id="viewSelect" class="form-control" onchange="toggleHintText();">
+                                <option>Desktop</option>
+                                <option>Mobile</option>
+
+                            </select>
+                                }
+                            }
+                            
+                        </div>
+                    </div>
+
+                    <div class="position-relative form-group col-md-6">
+                        <label for="bannerFile" class="">Upload Banner Image File</label>
+                        <div class="col-md-7">
+                            <input asp-for="@Model.image" type="file" accept="*/*" name="imgfile" id="imgfile" class="form-control-file" value="" onchange="validateFileResolution(this,event);" onclick="FileOnClick(event);">
+                        </div>
+                        @{
+                            if(Model.view == "desktop")
+                            {
+                                <small class="form-text text-muted" id="txtImageHint">Please select an image of Resolution @dwidth px x @dheight px.</small>
+                            }
+                            else if (Model.view == "mobile")
+                            {
+                                <small class="form-text text-muted" id="txtImageHint">Please select an image of Resolution @mwidth px x @mheight px.</small>
+                            }
+                            else
+                            {
+                                <small class="form-text text-muted" id="txtImageHint">Please select an image of Resolution @dwidth px x @dheight px.</small>
+                            }
+                        }
+                        
+                    </div>
+
+
+                </div>
+                <div class="row">
+                    @*<div class="col-md-6">
+                    @{
+                    if (ViewBag.Title != "Edit")
+                    {
+                    <div class="position-relative form-group">
+
+                    <label asp-for="@bannerCount" class="">Banner ID</label>
+                    <div class="input-group" style="display:block !important">
+                    <div class="input-group-prepend">
+                    <i class="fas fa-store text-color-primary text-3 position-absolute" style="padding: 12px 5px 0px 10px;"></i>
+                    <input asp-for="@bannerCount" name="BannerId" id="BannerId" placeholder="Banner Id" style="padding-left:40px;" type="text" class="form-control" aria-describedby="BannerId-error" disabled>
+                    </div>
+                    </div>
+                    <em id="BannerId-error" class="error invalid-feedback">Banner Id for the Image</em>
+
+                    </div>
+                    }
+                    else
+                    {
+                    <div class="position-relative form-group">
+                    <label asp-for="@Model.banner_id" class="">Banner ID</label>
+                    <div class="input-group" style="display:block !important">
+                    <div class="input-group-prepend">
+
+                    <i class="fas fa-store text-color-primary text-3 position-absolute" style="padding: 12px 5px 0px 10px;"></i>
+                    <input asp-for="@Model.banner_id" name="BannerId" id="BannerId" placeholder="Banner Id" style="padding-left:45px;" type="text" class="form-control" aria-describedby="BannerId-error" disabled>
+                    </div>
+                    </div>
+                    <em id="BannerId-error" class="error invalid-feedback">Banner Id for the Image</em>
+                    </div>
+
+                    }
+                    }
+
+                    </div>*@
+                    <div class="form-group col-md-6">
+
+                        <label asp-for="@Model.title" class="">Banner Title</label>
+                        <div class="position-relative">
+                            @*<div class="input-group" style="display:block !important">
+                            <div class="input-group-prepend">*@
+
+                            <i class="fa fa-pen text-color-primary text-3 position-absolute" style="padding: 12px 5px 0px 10px;"></i>
+                            <input asp-for="@Model.title" name="BannerTitle" id="BannerTitle" placeholder="Banner Title" type="text" style="padding-left:45px;" class="form-control" aria-describedby="BannerTitle-error">
+                            <em id="BannerTitle-error" class="error invalid-feedback">Please Select the Image</em>
+                            @*</div>
+                            </div>*@
+                        </div>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label asp-for="@Model.ad_hyperlink" class="">HyperLink for Image</label>
+                        <div class="position-relative">
+                            @*<div class="input-group" style="display:block !important">
+                            <div class="input-group-prepend">*@
+                            <i class="fas fa-link text-color-primary text-3 position-absolute" style="padding: 12px 5px 0px 10px;"></i>
+                            <input asp-for="@Model.ad_hyperlink" name="Hyperlink" id="HyperLink" placeholder="HyperLink" type="text" style="padding-left:45px;" class="form-control" aria-describedby="Hyperlink-error">
+                            @*</div>
+                            </div>*@
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+
+                    <div class="col-md-6">
+                        <div class="position-relative form-group">
+                            <label for="statusSelect" class="">Select Status</label>
+                            <select asp-for="@Model.status" name="Status" id="statusSelect" class="form-control">
+                                <option>active</option>
+                                <option>inactive</option>
+
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="position-relative form-group">
+                            <label for="languageSelect" class="">Select Language</label>
+                            <select asp-for="@Model.language_id" name="language" id="languageSelect" class="form-control">
+                                @{
+                                    if (@Model.language_id != 0)
+                                    {
+                                        if (@Model.language_id == 1)
+                                        {
+                                            <option selected>English</option>
+                                            <option>French</option>
+                                        }
+                                        else if (@Model.language_id == 2)
+                                        {
+                                            <option selected>French</option>
+                                            <option>English</option>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <option>English</option>
+                                        <option>French</option>
+                                    }
+                                }
+
+
+
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                @*<div class="row">
+
+
+
+                </div>*@
+
+            </div>
+            <div class="modal-footer2">
+                <div style="">
+                    <button id="closeModeldown" type="button" class="btn btn-warning" data-dismiss="modal" onclick="closeModal();">Close</button>
+                    @{
+                        if (ViewBag.Title == "Edit")
+                        {
+                            <button id="UpdateBanner" type="button" class="btn btn-primary" name="bannerupload" value="submit" onclick="updateBanner();">Update & Preview</button>
+                        }
+                        else
+                        {
+                            <button id="SaveBanner" type="button" class="btn btn-success" name="bannerupload" value="submit" onclick="saveBanner();">Save & Preview</button>
+                        }
+                    }
+
+                </div>
+
+                <div style="display: block;margin-left: auto;">
+                    @*<button id="publish" type="button" class="btn btn-primary" name="publish" value="submit" onclick=window.location='@Url.Action("Publish","Banner",TempData["imgid"])'>Publish</button>*@
+                    <button id="publish" type="button" class="btn btn-info" name="publish" value="submit" onclick=btnPublish();>Publish</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+<script>var formModeCheck = '@ViewBag.Title';
+    var mwidthSize = '@mwidth';
+    var mheightSize = '@mheight';
+    var dwidthSize = '@dwidth';
+    var dheightSize = '@dheight';
+    </script>
+@section Scripts {
+    @*<script type="text/javascript" src="/assets/scripts/main.8d288f825d8dffbbe55e.js"></script>
+    <script src="~/assets/js/jquery-3.3.1.min.js"></script>
+    <script src="/lib/jquery/dist/jquery.min.js"></script>*@
+    @*<script src="~/js/toastr.js"></script>*@
+    <script type="text/javascript">
+
+        //function btnPublish() {
+
+        //    var url = "/Home/Publish;
+        //    $.ajax({
+        //        type: "Get",
+        //        url: url,
+        //        data: { img: @ViewBag.img}
+        //                        success: function(data) {
+
+        //                                },
+        //        error: function(exp) {
+        //            alert(exp.responseText);
+        //        }
+        //    });
+        //}
+
+        function saveBanner() {
+
+            var formData = new FormData($('#bannerupload')[0]);
+            var url = $('#bannerupload').attr('action');
+            $.ajax({
+                type: "Get",
+                url: url,
+                type: "POST",
+                data: formData,
+                async: false,
+                success: function(data) {
+                    if (data != null) {
+                        if (data.isSuccessfull) {
+                            toastr.success(data.message);
+                        }
+                        else {
+                            toastr.error(data.message);
+                        }
+                    }
+                    else {
+                        // $("#dvErrorAuth").html("FE: Something went wrong");
+                    }
+                },
+                error: function(exp) {
+                    alert(exp.responseText);
+                },
+                cache: false,
+                contentType: false,
+                processData: false
+            });
+        }
+    </script>
+    }

@@ -1,0 +1,150 @@
+﻿@using System.Text.RegularExpressions
+@using MrLubeCMS.ViewModels;
+@inject IConfiguration _configuration;
+@model ViewModelFloatingImage;
+@{
+    var AzureBlob = _configuration.GetSection("AzureBlob").Value;
+    var bannerpath = "/img/floating/";
+    ViewBag.Title = "View";
+    var floatingImagePages = ViewBag.FloatingImagePages;
+    Layout = null;
+    var serverTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Eastern Standard Time");
+    DateTime dt1 = TimeZone.CurrentTimeZone.ToLocalTime(Model.FloatingImageDto.CreatedDate.Value);
+    string dFormat = dt1.ToString("dd MMM yyyy HH:mm:ss");
+}
+
+<div class="modal-dialog modal-lg">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h4 class="modal-title" id="modalCMSLabel">Floating Image Details</h4>
+            <button id="btnCloseDetail" data-dismiss="modal" type="button" class="close" aria-label="Close" aria-hidden="true" onclick="closeModal();">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        <div class="modal-body">
+            <ul class="nav nav-tabs nav-fill" style="font-size:17px">
+                <li class="tabs active"><a data-toggle="tab" class="active nav-link" href="#tabDetail"> <i class="fa fa-user"></i> Details</a></li>
+                <li class="tabs"><a data-toggle="tab" class="nav-link" href="#tabPage"><i class="fa fa-clipboard"></i> Pages</a></li>
+            </ul>
+            <div class="tab-content" style=" margin-top:14px">
+                <div id="tabDetail" class="tab-pane active">
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="row" style="border-bottom: 1px solid grey;">
+                                <label class="col-lg-3 pt-3 pb-2" style="margin-bottom: 0px; font-weight:600; background-color:#f8f9fa;"><i class="fas fa-id-badge" style="width:20%;"></i><span style="width:25%;">GUID:</span></label>
+                                <label class="col-lg-3 pt-3 pb-2" style="margin-bottom: 0px; font-weight:500;">@Model.FloatingImageDto.guid</label>
+                                <label for="@Model.FloatingImageDto.ImageName" class="col-lg-2 pt-3" style="word-wrap: break-word; background-color: #f8f9fa; margin-bottom: 0px; font-weight:500;"></label>
+                                @{
+                                    if (Model.FloatingImageDto.ViewDevice == "desktop")
+                                    {
+                                        var img = AzureBlob + bannerpath + @Model.FloatingImageDto.ImageName;
+                                        <div class="col-md-4" style="display:block; text-align:center;background-color: #f8f9fa;">
+                                            <img src="@Url.Content(img)" style="height:95%; width:80%; padding-top: 0px; padding-left: 0px; background-color: #f8f9fa;" asp-append-version="true" />
+                                        </div>
+                                    }
+
+                                    else
+                                    {
+                                        var img = AzureBlob + bannerpath + @Model.FloatingImageDto.ImageName;
+                                        <div class="col-md-4" style="display:block; text-align:center;background-color: #f8f9fa;">
+                                            <img src="@Url.Content(img)" style="height:45%; width:100%; padding-top: 0px; padding-left: 0px; background-color: #f8f9fa;" asp-append-version="true" />
+                                        </div>
+                                    }
+                                }
+                                @*<img src="@Url.Content("~/" + @Model.FloatingImageDto.ImageName)" class="col-md-4" height="80" width="140" style="padding-top: 0px; padding-left: 0px; border-bottom: 1px solid grey;" asp-append-version="true" />*@
+                            </div>
+
+                            <div class="row">
+                                <label class="col-lg-3 pt-3 pb-2" style="margin-bottom: 0px; font-weight:600; background-color:#f8f9fa; border-bottom: 1px solid grey;"><i class="fa fa-language" style="width:20%;"></i><span style="width:25%;">Language:</span></label>
+                                @{
+                                    if (Model.FloatingImageDto.LanguageId == 1)
+                                    {
+                                        <label class="col-lg-3 pt-3 pb-2" style="margin-bottom: 0px; font-weight:500; border-bottom: 1px solid grey;">English</label>
+                                    }
+                                    else if (Model.FloatingImageDto.LanguageId == 2)
+                                    {
+                                        <label class="col-lg-3 pt-3 pb-2" style="margin-bottom: 0px; font-weight:500; border-bottom: 1px solid grey;">French</label>
+                                    }
+                                }
+
+                                <label class="col-lg-3 pt-3 pb-2" style="margin-bottom: 0px; font-weight:600; background-color:#f8f9fa; border-bottom: 1px solid grey;"><i class="fa fa-pen" style="width:20%;"></i><span style="width:25%;">Title:</span></label>
+                                <label class="col-lg-3 pt-3 pb-2" style="word-wrap: break-word; margin-bottom: 0px; font-weight:500; border-bottom: 1px solid grey;">@Model.FloatingImageDto.Title</label>
+                            </div>
+                            <div class="row">
+                                <label class="col-lg-3 pt-3 pb-2" style="margin-bottom: 0px; font-weight:600; background-color: #f8f9fa; border-bottom: 1px solid grey;"><i class="fas fa-file-image" style="width:20%;"></i><span style="width:25%;">Image Name:</span></label>
+                                <label class="col-lg-3 pt-3 pb-2" style="word-wrap: break-word; margin-bottom: 0px; font-weight:500; border-bottom: 1px solid grey;">@Model.FloatingImageDto.ImageName</label>
+                                <label class="col-lg-3 pt-3 pb-2" style="margin-bottom: 0px; font-weight:600; background-color:#f8f9fa; border-bottom: 1px solid grey;"><i class="fa fa-file" style="width:20%;"></i><span style="width:25%;">Page Type:</span></label>
+                                <label class="col-lg-3 pt-3 pb-2" style="margin-bottom: 0px; font-weight:500; border-bottom: 1px solid grey;">@Model.FloatingImageDto.ViewPage</label>
+                            </div>
+
+                            <div class="row">
+                                <label class="col-lg-3 pt-3 pb-2" style="margin-bottom: 0px; font-weight:600; background-color: #f8f9fa; border-bottom: 1px solid grey;"><i class="fa fa-tablet" style="width:20%;"></i><span style="width:25%;">View Device:</span></label>
+                                <label class="col-lg-3 pt-3 pb-2" style="margin-bottom: 0px; font-weight:500; border-bottom: 1px solid grey;">@Model.FloatingImageDto.ViewDevice</label>
+                                <label class="col-lg-3 pt-3 pb-2" style="margin-bottom: 0px; font-weight:600; background-color: #f8f9fa; border-bottom: 1px solid grey;"><i class="fas fa-info" style="width:20%;"></i><span style="width:25%;">Image Status</span></label>
+                                <label class="col-lg-3 pt-3 pb-2" style="margin-bottom: 0px; font-weight:500; border-bottom: 1px solid grey;">@Model.FloatingImageDto.ImageStatus</label>
+                            </div>
+                            <div class="row">
+                                <label class="col-lg-3 pt-3 pb-2" style="margin-bottom: 0px; font-weight:600; background-color:#f8f9fa; border-bottom: 1px solid grey;"><i class="fa fa-user" style="width:20%;"></i><span style="width:25%;">Last User:</span></label>
+                                <label class="col-lg-3 pt-3 pb-2" style="margin-bottom: 0px; font-weight:500; border-bottom: 1px solid grey;">@Model.FloatingImageDto.LastUser</label>
+                                <label class="col-lg-3 pt-3 pb-2" style="margin-bottom: 0px; font-weight:600; background-color: #f8f9fa; border-bottom: 1px solid grey;"><i class="fas fa-link" style="width:20%;"></i><span style="width:25%;">HyperLink</span></label>
+                                <label class="col-lg-3 pt-3 pb-2" style="word-wrap: break-word; margin-bottom: 0px; font-weight:500; border-bottom: 1px solid grey;">@Model.FloatingImageDto.Hyperlink</label>
+                            </div>
+                            <div class="row">
+                                
+                                <label class="col-lg-3 pt-3 pb-2" style="font-weight:600; padding-left: 15px; background-color:#f8f9fa; border-bottom: 1px solid grey;"><i class="fa fa-calendar" style="width:20%;"></i><span style="width:25%;">Created Date:</span></label>
+                                <label class="col-lg-3 pt-3 pb-2" style="font-weight:500; border-bottom: 1px solid grey;">@TimeZoneInfo.ConvertTimeToUtc(Model.FloatingImageDto.CreatedDate.Value,serverTimeZone).ToString("dd MMM yyyy HH:mm:ss")</label>
+                                <label class="col-lg-3 pt-3 pb-2" style="font-weight:600; padding-left: 15px; background-color: #f8f9fa; border-bottom: 1px solid grey;"><i class="fa fa-calendar" style="width:20%;"></i><span style="width:25%;">Update Date:</span></label>
+                                <label class="col-lg-3 pt-3 pb-2" style="font-weight:500; border-bottom: 1px solid grey;">@TimeZoneInfo.ConvertTimeToUtc(Model.FloatingImageDto.UpdatedDate.Value,serverTimeZone).ToString("dd MMM yyyy HH:mm:ss")</label>
+                            </div>
+                            @*<div class="row">
+                                
+                                
+                            </div>*@
+                        </div>
+                    </div>
+                </div>
+                <div id="tabPage" class="tab-pane">
+                    <input asp-for="@Model.FloatingImageDto.selectedPages" type="hidden" id="selectedPages" name="selectedPages" class="form-control-file" value="@Model.FloatingImageDto.selectedPages" />
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <fieldset>
+                                <legend>Pages</legend>
+                                <div id="listPages" class="col-md-12 checkbox-group required">
+                                    <label id="lblCbxValidate"></label>
+                                    @{
+                                        foreach (var item in Model.SubMenus)
+                                        {
+                                            if (ViewBag.FloatingImagePages != null)
+                                            {
+                                                string reg = @Regex.Replace(item.title, @"\s+", "");
+
+                                                <div class="col-md-6">
+                                                    @{
+                                                        string isActive = "";
+                                                        foreach (var check in ViewBag.FloatingImagePages)
+                                                        {
+                                                            if (@item.url_key == check.url_key)
+                                                            {
+                                                                isActive = "disabled";
+                                                            }
+                                                        }
+                                                        if (isActive == "disabled")
+                                                        {
+                                                            <input id="cbxPage" type="checkbox" class="cbxMark" disabled="@isActive" name="@reg" value="@item.sub_menu_id" />
+                                                            <label for="@reg">@item.title</label>
+                                                        }
+                                                    }
+                                                </div>
+                                            }
+                                        }
+                                    }
+                                </div>
+                            </fieldset>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>

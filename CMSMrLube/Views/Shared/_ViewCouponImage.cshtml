@@ -1,0 +1,251 @@
+﻿@model CMS.Core.Entities.CouponImages;
+@using static IWebHostEnvironment;
+@using Microsoft.Extensions.Configuration;
+@inject IConfiguration Configuration;
+@{
+    var AzureBlob = Configuration.GetSection("AzureBlob").Value;
+    var bannerpath = "/img/coupons/";
+    var image = TempData["mainImage"];
+    var mwidth = ViewBag.mwidth;
+    var mheight = ViewBag.mheight;
+    var dwidth = ViewBag.dwidth;
+    var dheight = ViewBag.dheight;
+    Layout = null;
+}
+@{
+    List<CMS.Core.Entities.CouponPages> ddlCouponPages = ViewBag.ddlCouponPages as List<CMS.Core.Entities.CouponPages>;
+    //List<CMS.Core.Entities.CouponPages> couponImages = ViewBag.ddlCouponPagesSelected as List<CMS.Core.Entities.CouponPages>;
+}
+<div class="modal-dialog" role="document">
+    <div class="modal-content">
+        <form asp-action="SaveCouponImage" id="formCouponImage" method="post" enctype="multipart/form-data">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalCMSLabel">@ViewBag.Title Coupon Image</h5>
+                <button type="button" class="close" data-bs-dismiss="modal" aria-hidden="true" onclick="closeModal();">&times;</button>
+            </div>
+            <div class="modal-body">
+                @{
+                    <input id="hdnStaggingDomain" type="hidden" value="@Configuration["StagingDomain"]" />
+                    <input id="hdnProdDomain" type="hidden" value="@Configuration["ProdDomain"]" />
+                }
+                <div class="row">
+
+                    <div class="form-group col-md-6">
+                        <div class="position-relative form-group">
+                            <label asp-for="@Model.view" class="form-label mb-1 text-2">Select View Device</label>
+                            @{
+                                if (ViewBag.Title == "Edit")
+                                {
+                                    <select asp-for="@Model.view" name="viewDevice" id="viewDevice" class="form-control" readonly onchange="toggleHintText();">
+                                        <option selected>@Model.view</option>
+                                        @*<option>Mobile</option>*@
+                                    </select>
+                                }
+                                else
+                                {
+                                    <select asp-for="@Model.view" name="viewDevice" id="viewDevice" class="form-control" onchange="toggleHintText();">
+                                        <option>Desktop</option>
+                                        <option>Mobile</option>
+                                    </select>
+                                }
+
+                            }
+
+                        </div>
+                    </div>
+                    <div class="position-relative form-group col-md-6">
+                        <label for="CouponImageFile">Upload Coupon Image Image File</label>
+                        <input asp-for="@Model.image" type="file" accept="*/*" name="imageFile" id="imageFile" class="form-control-file" value="" onchange="validateFileResolution(this,event);" onclick="FileOnClick(event);" />
+
+                        @{
+                            if (Model.view == "desktop")
+                            {
+                                <small class="form-text text-muted" id="txtImageHint">Please select an image of Resolution @dwidth px x @dheight px.</small>
+                            }
+                            else if (Model.view == "mobile")
+                            {
+                                <small class="form-text text-muted" id="txtImageHint">Please select an image of Resolution @mwidth px x @mheight px.</small>
+                            }
+                            else
+                            {
+                                <small class="form-text text-muted" id="txtImageHint">Please select an image of Resolution @dwidth px x @dheight px.</small>
+                            }
+                        }
+
+                    </div>
+                    @*@{
+                    if (@Model.image != null)
+                    {
+                    <div class="col-md-6" style="float:right; display:block">
+                    <img src="@Url.Content("~/" + @Model.image)" class="rounded-circle" height="80" width="140" asp-append-version="true" />
+
+                    @{
+                    if (ViewBag.Title == "Edit")
+                    {
+                    <label for="@Model.image" style="margin-left: 10px; ">@Model.image</label>
+                    //<input for="@Model.image" type="text" name="imageFileName" class="form-control" value="@Model.image" disabled style="margin-top: 5px; margin-bottom: 5px;" />
+                    }
+
+                    <input for="@ViewBag.Title" type="hidden" id="formMode" name="formMode" class="form-control-file" value="@ViewBag.Title" />
+                    <input for="@Model.image" type="hidden" id="imageUpload" name="imageUpload" class="form-control-file" value="@Model.image" />
+                    <input asp-for="@Model.coupon_image_id" type="hidden" id="coupon_image_id" name="coupon_image_id" class="form-control-file" value="@Model.coupon_image_id" />
+                    <input asp-for="@Model.guid" type="hidden" id="guid" name="guid" class="form-control-file" value="@Model.guid" />
+                    }
+                    </div>
+
+                    }
+                    }*@
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        @{
+                            @if (@Model.image != null)
+                            {
+                                if (@Model.view == "desktop")
+                                {
+                                    <div style="display:block; margin-bottom:5px;text-align:center;">
+                                        <img src="@Url.Content(AzureBlob + bannerpath + @Model.image)" class="" style="height:30%; width:95%;" asp-append-version="true" />
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div style="display:block; margin-bottom:5px;text-align:center;">
+                                        <img src="@Url.Content(AzureBlob + bannerpath + @Model.image)" class="" style="height:90%; width:30%;" asp-append-version="true" />
+                                    </div>
+                                }
+
+                            }
+                        }
+                    </div>
+
+                    <div class="col-md-6">
+                        @{
+                            if (ViewBag.Title == "Edit")
+                            {
+                                <label for="@Model.image" style="margin-left: 10px; ">@Model.image</label>
+                                //<input for="@Model.image" type="text" name="imageFileName" class="form-control" value="@Model.image" disabled style="margin-top: 5px; margin-bottom: 5px;" />
+                            }
+
+                            <input for="@ViewBag.Title" type="hidden" id="formMode" name="formMode" class="form-control-file" value="@ViewBag.Title" />
+                            <input for="@Model.image" type="hidden" id="imageUpload" name="imageUpload" class="form-control-file" value="@Model.image" />
+                            <input asp-for="@Model.coupon_image_id" type="hidden" id="coupon_image_id" name="coupon_image_id" class="form-control-file" value="@Model.coupon_image_id" />
+                            <input asp-for="@Model.guid" type="hidden" id="guid" name="guid" class="form-control-file" value="@Model.guid" />
+                        }
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="form-group col-md-6">
+                        <label asp-for="@Model.title" class="form-label mb-1 text-3">Title</label>
+                        <div class="position-relative">
+                            <i class="fa fa-pen text-color-primary text-3 position-absolute" style="padding: 12px 5px 0px 10px;"></i>
+                            @*@Html.TextBoxFor(x => x.title, new { @class="form-control text-3 h-auto px-5"})*@
+                            <input asp-for="@Model.title" name="title" id="title" placeholder="Title" type="text" class="form-control" style="padding-left:45px;" aria-describedby="title-error" />
+                            @*<span asp-validation-for="@Model.title" class="text-danger"></span>*@
+                            <em id="title-error" class="error invalid-feedback">Please enter Title.</em>
+                        </div>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <div class="position-relative form-group">
+                            <label asp-for="@Model.url_key" class="form-label mb-1 text-2">Select Coupon Page</label>
+                            <select onchange="titleOnChange();" asp-for="@Model.url_key" name="url_key" id="url_key" class="form-control">
+                                @{
+                                    //if (ddlCouponPages != null || ddlCouponPages.Count() > 0)
+                                    //{
+                                    //    if (couponImages == null || couponImages.Count == 0)
+                                        //{
+                                        //    <option value="">--Select--</option>
+                                        //}
+                                        <option value="">--Select--</option>
+                                        @foreach (var item in ddlCouponPages)
+                                        {
+                                            <option value="@item.url_Key">@item.title</option>
+                                        }
+                                    //}
+                                }
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="form-group col-md-6">
+                        <div class="position-relative form-group">
+                            <label asp-for="@Model.status" class="form-label mb-1 text-2">Select Status</label>
+                            <select asp-for="@Model.status" name="imageStatus" id="imageStatus" class="form-control">
+                                <option>Active</option>
+                                <option>Inactive</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <div class="position-relative form-group">
+                            <label asp-for="@Model.language_id" class="form-label mb-1 text-2">Choose your preferred language</label>
+                            <select asp-for="@Model.language_id" name="language" id="language" class="form-control" onchange="titleOnChange()">
+                                @{
+                                    if (Model.language_id != 0)
+                                    {
+                                        if (Model.language_id == 1)
+                                        {
+                                            <option selected>English</option>
+                                            <option>French</option>
+                                        }
+                                        else if (Model.language_id == 2)
+                                        {
+                                            <option selected>French</option>
+                                            <option>English</option>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <option>English</option>
+                                        <option>French</option>
+                                    }
+                                }
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="row" id="dvCouponUrls">
+                    <div class="form-group col-md-6">
+                        <label class="form-label mb-1 text-3">Staging url</label>
+                        <div class="position-relative">
+                            <a id="dvStagingCouponUrl" target="_blank" href="" style="cursor:pointer"></a>
+                        </div>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label class="form-label mb-1 text-3">Production url</label>
+                        <div class="position-relative">
+                            <a id="dvProductionCouponUrl" target="_blank" href="" style="cursor:pointer"></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <div>
+                    <button id="btnCloseModel" type="button" class="btn btn-warning" onclick="closeModal();">Close</button>
+                    @{
+                        if (ViewBag.Title == "Edit")
+                        {
+                            <button id="btnUpdate" type="button" class="btn btn-primary" name="submit" value="submit" onclick="updateCouponImage();">Update & Preview</button>
+                        }
+                        else
+                        {
+                            <button id="btnSave" type="button" class="btn btn-success" name="submit" value="submit" onclick="saveCouponImage()">Save & Preview</button>
+                        }
+                    }
+                </div>
+                <div style="display: block; margin-left: auto;">
+                    <button id="btnPublish" type="button" class="btn btn-info" name="submit" value="submit" onclick="publishCouponImage();">Publish</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+<script>
+    var formModeCheck = '@ViewBag.Title';
+    var mwidthSize = '@mwidth';
+    var mheightSize = '@mheight';
+    var dwidthSize = '@dwidth';
+    var dheightSize = '@dheight';
+    var couponPage = '@Json.Serialize(ViewBag.ddlCouponPages)';
+    var couponPages = JSON.parse(couponPage);
+</script>

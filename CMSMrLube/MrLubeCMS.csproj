@@ -1,0 +1,94 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Remove="Models\**" />
+    <Compile Remove="Repositories\**" />
+    <Content Remove="Models\**" />
+    <Content Remove="Repositories\**" />
+    <EmbeddedResource Remove="Models\**" />
+    <EmbeddedResource Remove="Repositories\**" />
+    <EntityDeploy Remove="Models\**" />
+    <EntityDeploy Remove="Repositories\**" />
+    <None Remove="Models\**" />
+    <None Remove="Repositories\**" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Remove="Controllers\Login.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Remove="Scripts\ShopTire.js" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Remove="appsettings.Development.json" />
+    <Content Remove="libman.json" />
+    <Content Remove="Views\Home\Banner.cshtml" />
+    <Content Remove="Views\Home\_partialBanner.cshtml" />
+    <!--<Content Remove="wwwroot\assets\scripts\ShopTireAll.js" />-->
+  </ItemGroup>
+  <!--<ItemGroup>
+	  <Content Remove="wwwroot\js\ShopTire.js" />
+	</ItemGroup>-->
+  <!--<ItemGroup>
+    <None Remove="Scripts\Banners\Banners.js" />
+  </ItemGroup>-->
+  <ItemGroup>
+    <Content Include="Scripts\Banners\Banners.js" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="12.0.0" />
+    <PackageReference Include="Azure.Extensions.AspNetCore.Configuration.Secrets" Version="1.0.0" />
+    <PackageReference Include="Azure.Identity" Version="1.12.0" />
+    <PackageReference Include="LinqKit" Version="1.2.3" />
+    <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.21.0" />
+    <PackageReference Include="Microsoft.ApplicationInsights.Profiler.AspNetCore" Version="2.5.0" />
+    <PackageReference Include="Microsoft.Identity.Client" Version="4.64.0" />
+    <PackageReference Include="Microsoft.Identity.Web" Version="3.1.0" />
+    <PackageReference Include="Microsoft.IdentityModel.Clients.ActiveDirectory" Version="5.3.0" />
+    <PackageReference Include="MySql.Data" Version="9.0.0" />
+    <PackageReference Include="MySql.EntityFrameworkCore" Version="8.0.5" />
+    <PackageReference Include="selectize" Version="0.12.1" />
+    <PackageReference Include="Serilog" Version="2.12.0" />
+    <PackageReference Include="Serilog.AspNetCore" Version="6.1.0" />
+    <PackageReference Include="Serilog.Enrichers.AspNetCore" Version="1.0.0" />
+    <PackageReference Include="Serilog.Enrichers.Environment" Version="2.2.0" />
+    <PackageReference Include="Serilog.Enrichers.Process" Version="2.0.2" />
+    <PackageReference Include="Serilog.Enrichers.Thread" Version="3.1.0" />
+    <PackageReference Include="Serilog.Settings.Configuration" Version="3.4.0" />
+    <PackageReference Include="Serilog.Sinks.ApplicationInsights" Version="4.0.0" />
+    <PackageReference Include="System.Linq.Dynamic.3.5" Version="1.0.0" />
+    <PackageReference Include="System.Linq.Dynamic.Core" Version="1.2.23" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.8" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.8" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.8" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.8" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.8" />
+    <PackageReference Include="Microsoft.Extensions.Configuration" Version="8.0.0" />
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="8.0.4" />
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.EntityFrameworkCore" Version="8.0.4" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="uploads\banners\" />
+    <Folder Include="wwwroot\assets\uploads\banners\" />
+    <Folder Include="Scripts\Banners" />
+    <!--<FunctionsPreservedDependencies Include="System.Text.Encodings.Web.dll" />-->
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="appsettings.Development.json" />
+    <None Include="libman.json" />
+    <None Include="wwwroot\assets\scripts\ShopTireAll.js" />
+    <None Include="wwwroot\assets\scripts\ShopTire.js" />
+    <None Include="wwwroot\js\ValidateRules.js" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Core\CMS.Core.csproj" />
+    <ProjectReference Include="..\Infrastructure\CMS.Infrastructure.csproj" />
+  </ItemGroup>
+  <!--<ItemGroup>
+		<Content Include="Scripts\ShopTire.js" />
+	</ItemGroup>-->
+</Project>

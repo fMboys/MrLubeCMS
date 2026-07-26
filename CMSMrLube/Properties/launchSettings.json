@@ -1,0 +1,35 @@
+{
+  "profiles": {
+    "MrLubeCMS": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "APPINSIGHTS_INSTRUMENTATIONKEY": "1463aa97-bb8c-4b04-be1c-0e0d8e840423",
+        "VaultUri": "https://key-devcom01.vault.azure.net/",
+        "AZURE_USERNAME": "akhan@mrlube.com"
+      },
+      "dotnetRunMessages": true,
+      "applicationUrl": "https://localhost:7214;http://localhost:5214",
+      "nativeDebugging": true
+    },
+    "IIS Express": {
+      "commandName": "IISExpress",
+      "launchBrowser": true,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "VaultUri": "https://key-devcom01.vault.azure.net/",
+        "AZURE_USERNAME": "akhan@mrlube.com"
+      },
+      "nativeDebugging": true
+    }
+  },
+  "iisSettings": {
+    "windowsAuthentication": false,
+    "anonymousAuthentication": true,
+    "iisExpress": {
+      "applicationUrl": "http://localhost:47164",
+      "sslPort": 44370
+    }
+  }
+}

@@ -1,0 +1,77 @@
+﻿@{
+    ViewData["Title"] = "Left Ad Images";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    //var leftAds = ViewBag.LeftAds;
+}
+
+<h1>@ViewData["Title"]</h1>
+<div class="card mb-3">
+    <div class="text-center d-block p-3 card-footer">
+        <div class="row col-md-12 text-center">
+                <div class="col-md-3">
+
+                <button type="button" name="AddNewItem" class="btn-pill btn-shadow btn-wide fsize-1 btn btn-primary btn-lg" style="padding-right: 25px; padding-left: 25px;" onclick="AddLeftAd(1,'desktop')">
+                        <span class="mr-2 opacity-7">
+                            <i class="fa fa-laptop"></i>
+                        </span>
+                        <span class="mr-1">Desktop-English</span>
+                    </button>
+                </div>
+                <div class="col-md-3">
+                <button type="button" name="AddNewItem" class="btn-pill btn-shadow btn-wide fsize-1 btn btn-info btn-lg" style="padding-right: 25px; padding-left: 25px;" onclick="AddLeftAd(2,'desktop')">
+                        <span class="mr-2 opacity-7">
+                            <i class="fa fa-laptop"></i>
+                        </span>
+                        <span class="mr-1">Desktop-French</span>
+                    </button>
+                </div>
+                <div class="col-md-3">
+                    <button type="button" name="AddNewItem" class="btn-pill btn-shadow btn-wide fsize-1 btn btn-focus btn-lg" onclick="AddLeftAd(1,'mobile')">
+                        <span class="mr-2 opacity-7">
+                            <i class="fa fa-mobile"></i>
+                        </span>
+                        <span class="mr-1">Mobile-English</span>
+                    </button>
+                </div>
+                <div class="col-md-3">
+                    <button type="button" name="AddNewItem" class="btn-pill btn-shadow btn-wide fsize-1 btn btn-alternate btn-lg" onclick="AddLeftAd(2,'mobile')">
+                        <span class="mr-2 opacity-7">
+                            <i class="fa fa-mobile"></i>
+                        </span>
+                        <span class="mr-1">Mobile-French</span>
+                    </button>
+                </div>
+            </div>
+    </div>
+
+    <div class="card-body">
+        <div class="row">
+            <div class="col-lg-12">
+                <table id="tblLeftAd" class="table table-hover table-striped table-bordered" cellspacing="0" width="100%">
+                    <thead>
+                        <tr>     
+                            <th style="width: 20%">Title</th>
+                            <th style="width: 25%">Image Name</th>
+                            <th style="width: 10%">Device</th>
+                            <th style="width: 10%">Language</th>
+                            <th style="width: 15%">Status</th>
+                            <th style="width: 15%">Action</th>
+                        </tr>
+                    </thead>
+
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script src="~/assets/js/jquery-3.3.1.min.js"></script>
+<script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+<script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+<script src="~/assets/scripts/LeftAd.js"></script>
+@*<script src="~/assets/scripts/CMSCommon.js"></script> *@
+@*//todo*@
+

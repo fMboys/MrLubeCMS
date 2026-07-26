@@ -1,0 +1,198 @@
+﻿@using CMS.Core.Interfaces;
+@model CMS.Core.Entities.tblquecmsimage;
+@inject CMS.Core.Interfaces.IbannerService _repo;
+@using static CMS.Core.Interfaces.IbannerService;
+@{
+    ViewBag.title = "Publish All";
+}
+<link rel="stylesheet" href="~/css/custom.css">
+<link rel="stylesheet" href="~/css/main.8d288f825d8dffbbe55e.css">
+
+<style>
+    .icon-wrapper {
+        height: 32px !important;
+        width: 34px !important;
+    }
+
+    table.table-hover table-striped table-bordered table, td {
+        padding: 0.15rem 0.55rem !important;
+    }
+
+    .dropdown {
+        text-align: center !important;
+    }
+
+        .dropdown a.view_store {
+            float: left;
+        }
+
+    #publishTable {
+        width: 100%;
+    }
+</style>
+
+@*<link rel="stylesheet" href="~/css/toastr.css">*@
+<h1>@ViewBag.title</h1>
+
+<div class="card mb-3">
+
+    <div class="card-body">
+
+        <div class="text-center d-block p-3 card-footer">
+            <button type="button" name="publishAll" class="btn-wide mb-2 mr-2 btn-pill btn btn-gradient-success btn-lg" onclick="publishAll();" @*data-toggle="modal" data-target="#modalCMS"*@ @*formnovalidate="formvalidate"*@>
+                <span class="mr-2 opacity-7">
+                    <i class="fa fa-bars" aria-hidden="true"></i>
+                    @*<i class="icon icon-anim-pulse ion-ios-analytics-outline"></i>*@
+                </span>
+
+                <span class="mr-1">Publish All</span>
+            </button>
+
+
+        </div>
+
+        <div class="d-flex justify-content-center">
+            <div class="spinner-border text-primary mb-3"
+                 style="width: 3rem; height: 3rem; display: none"
+                 role="status" id="loading">
+                <span class="sr-only">Loading...</span>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <table id="publishTable" style="width:100% !important;" class="table table-hover table-striped table-bordered">
+                    <thead>
+                        <tr>
+                            <th style="width:10% !important;">Publish Id</th>
+                            <th style="width:10% !important;">ID</th>
+                            <th style="width:20% !important;">Name</th>
+                            <th style="width:10% !important;">Action</th>
+                            <th style="width:10% !important;">Type</th>
+                            <th style="width:25% !important;">Path</th>
+                            @*<th style="width:15% !important;">Select All Publish<br><input type="checkbox" class="form-check-input"></th>*@
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('#publishTable_length').hide();
+            $('#publishTable_filter').hide();
+
+            //ValidateRules();
+            getPublishList();
+        });
+
+        function getPublishList() {
+            var id = "";
+            var image = "";
+            var view = "";
+            var Status = "";
+            var lang = "";
+            var url = "/PublishAll/PublishList";
+            var table = $('#publishTable').DataTable({
+                "ajax": {
+                    "url": url,
+                    "type": "Post",
+                    "data": { id: id, view: view, lang: lang, Status: Status, image: image },
+                    "datatype": "json",
+                },
+                "columns": [
+
+                    { "data": "tblquecms_id", "name": "tblquecms_id", "width": "10%" },
+                    { "data": "img_id", "name": "img_id", "width": "10%" },
+                    { "data": "img_name", "name": "img_name", "width": "25%" },
+                    { "data": "action_done", "name": "action_done", "width": "15%" },
+                    { "data": "banner_type", "name": "banner_type", "width": "15%" },
+                    { "data": "img_uploadPath", "name": "img_uploadPath", "width": "25%" }
+                    //{ "data": "Action", "name": "non", "width": "15%" }
+                ],
+                "columnDefs": [
+                    {
+                        //"targets": 5,
+                        //"data": null,
+                        //"orderable": true,
+                        //"render": function(data, type, full, meta) {
+
+                        //    //var viewUrl = "'/Banner/Detail/" + full.banner_id + "'";
+                        //    //var editUrl = "'/Banner/Edit/" + full.banner_id + "'";
+                        //    //var delUrl = "'/Banner/Delete/" + full.banner_id + "'";
+                        //    //var edit = '<div style="display: inline-flex; white-space:normal;width:10%;"> \n'
+                        //    //edit = edit + '<input type="checkbox" class="form-check-input">'
+
+                        //    //'</div ></td > '
+
+
+                        //    return null;
+                        //}
+                    },
+                ],
+                "initComplete": function (data, json) {
+                    $(".loader").hide();
+                },
+                "responsive": "true",
+                "serverSide": "true",
+                "order": [0, "asc"],
+                //"searchDelay": 350,
+                //"filter": "true",
+                /// "processing": "true",
+                "destroy": "true",
+                "searching": "false",
+                "language": {
+                    //"processing": 'Processing- please wait'
+
+                }
+            });
+
+            $('#publishTable_filter').hide();
+            $('#publishTable_length').hide();
+        }
+
+        //Publish all images into Prod.
+        function publishAll() {
+
+            var url = "/PublishAll/PublishAll";
+            document.getElementById("loading").style.display = "block";
+            $.ajax({
+                type: "Get",
+                url: url,
+                //data: formData,
+                success: function (data) {
+                    if (data != null) {
+                        if (data.data.isSuccessfull === true) {
+                            document.getElementById("loading").style.display = "none";
+                            getPublishList();
+                            toastr.success(data.data.message);
+                            //$('#modalCMS').modal('hide');
+                        }
+                        else {
+                            document.getElementById("loading").style.display = "none";
+                            toastr.error(data.data.message);
+                        }
+                    }
+                    else {
+                        document.getElementById("loading").style.display = "none";
+                        toastr.error("No Data Found.");
+                    }
+                },
+                error: function (exp) {
+                    alert(exp.responseText);
+                }
+            });
+        }
+
+
+    </script>
+    @*<script src="~/js/ValidateRules.js"></script>
+    <script src="~/js/Banners.js"></script>*@
+    }
+

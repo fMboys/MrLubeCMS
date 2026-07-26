@@ -1,0 +1,758 @@
+﻿@using CMS.Core.Interfaces;
+@model CMS.Core.Entities.banners;
+@inject CMS.Core.Interfaces.IbannerService _repo;
+@using static CMS.Core.Interfaces.IbannerService;
+@{
+    dynamic getall = _repo.GetAll();
+    //bannerData? imgdata = ViewBag.image as bannerData;
+    var banner1 = ViewBag.bann;
+    //var img = ViewBag.image;
+    ViewData["Title"] = "Home Page Banners";
+    //var img = TempData["mainimg"];
+    //Layout = null;
+}
+<link rel="stylesheet" href="~/css/custom.css">
+@*<link rel="stylesheet" href="~/css/main.8d288f825d8dffbbe55e.css">*@
+
+<style>
+    .icon-wrapper {
+        height: 32px !important;
+        width: 34px !important;
+    }
+
+    table.table-hover table-striped table-bordered table, td {
+        padding: 0.15rem 0.55rem !important;
+    }
+
+    .dropdown {
+        text-align: center !important;
+    }
+
+        .dropdown a.view_store {
+            float: left;
+        }
+
+    #bannerTable {
+        width: 100%;
+    }
+</style>
+
+@*<link rel="stylesheet" href="~/css/toastr.css">*@
+<h1>@ViewData["Title"]</h1>
+
+<div class="card mb-3">
+    <div class="text-center d-block p-3 card-footer">
+        <button type="button" name="AddBanner" class="btn-pill btn-shadow btn-wide fsize-1 btn btn-primary btn-lg" onclick="NewBanner();" @*data-toggle="modal" data-target="#modalCMS"*@ @*formnovalidate="formvalidate"*@>
+            <span class="mr-2 opacity-7">
+                <i class="fa fa-plus"></i>
+                @*<i class="icon icon-anim-pulse ion-ios-analytics-outline"></i>*@
+            </span>
+
+            <span class="mr-1">Home Page Banners</span>
+        </button>
+    </div>
+    <div class="card-body">
+
+        @*<div class="row">
+
+        <div class="col-md-2">
+        Html.DropDownList("BannerId", new SelectList(_repo.GetAll(), "BannerId", "BannerId"), "Select Banner", new { @class = "form-control", id = "BannerId" })
+        <select id="ddlBannerId" class="form-select form-control">
+
+        <option value="">select Banner Id</option>
+
+
+        @foreach (var item in @ViewBag.bannerIds)
+        {
+        <option value="@item.banner_id">@item.banner_id</option>
+        }
+
+        </select>
+        </div>
+
+        <div class="col-md-2">
+        @Html.DropDownList("BannerView", new List<SelectListItem>
+        {
+        new SelectListItem{ Text="Desktop", Value = "desktop", },
+        new SelectListItem{ Text="Mobile", Value = "mobile" }
+        }, "Select Views", new { @class = "form-control", id = "BannerView" })
+
+        </div>
+        <div class="col-md-2">
+        @Html.DropDownList("BannerLanguage", new List<SelectListItem>
+        {
+        new SelectListItem{ Text="English", Value = "1", },
+        new SelectListItem{ Text="French", Value = "2" }
+        }, "Select Language", new { @class = "form-control js-source-states", id = "BannerLanguage" })
+
+        </div>
+        <div class="col-md-2">
+        @Html.DropDownList("BannerStatus", new List<SelectListItem>
+        {
+        new SelectListItem{ Text="active", Value = "active", },
+        new SelectListItem{ Text="inactive", Value = "inactive" }
+        }, "Select Status", new { @class = "form-control js-source-states", id = "BannerStatus" })
+
+        </div>
+        <div class="col-md-4">
+        <div class="input-container ">
+        <select id="ddlBannerImage" class="form-select form-control">
+
+        <option value="">select Banner Image</option>
+
+
+        @foreach (var item in @ViewBag.bannerIds)
+        {
+        <option value="@item.image">@item.image</option>
+        }
+
+        </select>
+        </div>
+
+        </div>
+        <div class="col-md-2">
+
+        <input type="button" value="Search" id="btnSearch" class="btn btn-info" onclick="getBannerList('@Url.Action("BannerList","Banner")')" />
+        <input type="button" value="Clear" class="btn btn-alternate" onclick="Clear()" />
+
+        </div>
+
+
+        </div>*@
+        <div class="row">
+            <div class="col-md-12">
+                <table id="bannerTable" style="width:100% !important;" class="table table-hover table-striped table-bordered">
+                    <thead>
+                        <tr>
+                            <th style="width:0% !important;" hidden>Banner Date</th>
+                            <th style="width:20% !important;">Title</th>
+                            <th style="width:20% !important;">Image</th>
+                            <th style="width:15% !important;">View</th>
+                            <th style="width:15% !important;">Status</th>
+                            <th style="width:15% !important;">Language</th>
+                            <th style="width:15% !important;">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+
+                </table>
+            </div>
+        </div>
+    </div>
+    @*<div class="modal fade" id="modalCMS" style="margin-top:30px" tabindex="-1" data-backdrop="static" role="dialog" aria-labelledby="bannerModalLabel" aria-modal="true">
+    Html.Partial("_partialBanner")
+    </div>*@
+    @*<!-- Modal -->
+    <div class="modal fade" id="modalCMS" style="margin-top:30px" tabindex="-1" role="dialog" aria-labelledby="bannerModalLabel" aria-modal="true">
+    <div class="modal-dialog" role="document">
+    <div class="modal-content">
+    <form asp-action="Banner" class="col-md-10 mx-auto" id="bannerupload" method="post">
+    <div class="modal-header">
+    <h5 class="modal-title" id="bannerModalLabel">Banner Image Uploading</h5>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+    <span aria-hidden="true">&times;</span>
+    </button>
+    </div>
+    <div class="modal-body">
+
+    <div class="position-relative form-group">
+    <label for="bannerFile" class="">Upload Banner Image File</label>
+    <input name="file" id="bannerFile" type="file" class="form-control-file">
+    <small class="form-text text-muted">Please Upload the Home Page Banner Image File with Size 700 * 350 Pixel.</small>
+    </div>
+    <div class="col-md-12">
+    <div class="position-relative form-group">
+    <label for="BannerTitle" class="">Banner Title</label><input name="BannerTitle" id="BannerTitle" placeholder="Banner Title" type="text" class="form-control" aria-describedby="BannerTitle-error">
+    <em id="BannerTitle-error" class="error invalid-feedback">Title for the Banner Image</em>
+    </div>
+    </div>
+    <div class="col-md-12">
+    <div class="position-relative form-group"><label for="ImageName" class="">HyperLink for Image</label><input name="Hyperlink" id="HyperLink" placeholder="HyperLink" type="text" class="form-control" value=""></div>
+    </div>
+    <div class="col-md-12">
+    <div class="position-relative form-group">
+    <label for="statusSelect" class="">Select Status</label>
+    <select name="Status" id="statusSelect" class="form-control">
+    <option>active</option>
+    <option>inactive</option>
+
+    </select>
+    </div>
+    </div>
+    <div class="col-md-12">
+    <div class="position-relative form-group">
+    <label for="languageSelect" class="">Select Language</label>
+    <select name="language" id="languageSelect" class="form-control">
+    <option>English</option>
+    <option>French</option>
+
+    </select>
+    </div>
+    </div>
+
+    </div>
+    <div class="modal-footer">
+    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+    <button type="submit" class="btn btn-primary" name="bannerupload" value="submit">Save changes</button>
+    </div>
+    </form>
+    </div>
+    </div>
+    </div>*@
+
+</div>
+
+@*<div class="tabs-animation">
+
+        </div>*@
+@section Scripts {
+    <script src="~/js/ValidateRules.js"></script>
+    <script src="~/js/Banners.js"></script>
+    @*<script src="~/js/toastr.js"></script>*@
+    @*<script src="/lib/jquery/dist/jquery.min.js"></script>
+    <script src="/lib/jquery/dist/jquery.js"></script>*@
+    @*<script src="/lib/jquery-validation/dist/jquery.validate.js"></script>
+    <script src="/lib/jquery-validation/dist/jquery.validate.min.js"></script>*@
+    @*<script src="/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>*@
+    @*<script src="~/assets/js/jquery-3.3.1.min.js"></script>*@
+    @*<script src="//cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>*@
+    @*<script src="../Views/Home/"></script>*@
+    @* <script src="~/assets/js/vendors/form-components/form-validation.js"></script>
+    <script src="~/assets/js/scripts-init/form-components/form-validation.js"></script>*@
+
+    <script type="text/javascript">
+        $(document).ready(function() {
+            //$('#bannerTable_length').hide();
+            // $('#bannerTable_filter').hide();
+
+            //ValidateRules();
+            getBannerList();
+        });
+
+        function getBannerList() {
+            var id = $("#ddlBannerId").val();
+            var image = $("#ddlBannerImage").val();
+            var view = $("#BannerView").val();
+            var Status = $("#BannerStatus").val();
+            var lang = $("#BannerLanguage").val();
+            var url = "/Banner/BannerList";
+            //$('#bannerTable_filter').hide();
+            //$('#bannerTable_filter').hide();
+            var table = $('#bannerTable').DataTable({
+                "ajax": {
+                    "url": url,
+                    "type": "POST",
+                    "data": { title: title, view: view, Status: Status, image: image, ad_hyperlink: ad_hyperlink },
+                    "datatype": "json",
+                },
+                "columns": [
+
+                    //{ "data": "guid", "name": "guid","width":"10%" },
+                    { "data": "banner_id", "name": "banner_id", visible: false },
+                    { "data": "title", "name": "title", "width": "20%" },
+                    { "data": "image", "name": "image", "width": "20%" },
+                    { "data": "view", "name": "view", "width": "15%" },
+                    { "data": "status", "name": "status", "width": "15%" },
+                    { "data": "language_id", "name": "language_id", "width": "15%" },
+                    //{ "data": "ad_hyperlink", "name": "ad_hyperlink","width":"25%" },
+                    { "data": "Action", "name": "non", "width": "15%" }
+                ],
+                "columnDefs": [
+                    {
+                        "targets": 6,
+                        "data": null,
+                        "orderable": false,
+                        "render": function(data, type, full, meta) {
+
+                            var viewUrl = "'/Banner/Details/" + full.guid + "'";
+                            var editUrl = "'/Banner/Edit/" + full.guid + "'";
+                            var delUrl = "'/Banner/Delete/" + full.guid + "'";
+                            var edit = '<div style="font-family: cursive;display: inline-flex; white-space:normal;width:10%;"> \n'
+                            edit = edit + '<button class="mb-2 mr-2 btn-icon btn-icon-only btn btn-primary" onclick="BannerEdit(' + editUrl + ')" title = "Edit Banner"><i class="pe-7s-pen btn-icon-wrapper"></i></button>'
+                                + '<button class="mb-2 mr-2 btn-icon btn-icon-only btn btn-warning" onclick="BannerView(' + viewUrl + ')" title = "View Banner"><i class="pe-7s-look btn-icon-wrapper"></i></button>'
+                                + '<button class="mb-2 mr-2 btn-icon btn-icon-only btn btn-danger" onclick="BannerDel(' + delUrl + ')" title = "Delete Banner"><i class="pe-7s-trash btn-icon-wrapper"></i></button>'
+
+                            //var editurl = '<div class="dropdown" style="text-align: center;"> \n'
+                            //if (full.View) {
+                            //    editurl = editurl + '<a href="/Banner/' + full.BannerId + '" class="view_banner" title="View Banner"> <span class="icon-wrapper icon-wrapper-alt rounded-circle"> <i class="pe-7s-look text-focus opacity-7 btn-icon-wrapper"> </i> </span> </a> \n'
+                            //}
+                            //if (full.Edit) {
+                            //    editurl = editurl + '<a href = "javascript:" onclick="Banner(' + editUrl + ')" class="view_banner" title = "Edit Banner" > <span class="icon-wrapper icon-wrapper-alt rounded-circle"> <i class="text-focus opacity-7 btn-icon-wrapper pe-7s-pen"> </i> </span> </a > \n'
+                            //}
+
+                            '</div ></td > '
+
+
+                            return edit;
+                        }
+                    },
+
+                                 {
+                        "targets": 5,
+                        "data": null,
+                        "orderable": true,
+                        //"searchable": false,
+                        "render": function(data, type, full, meta) {
+                            //var eng = "";
+                            //var fr = "";
+                            if(meta.col == "5" )
+                            {
+                                if (data == "1") {
+                                    return "English";
+                                }
+                                else if (data == "2") {
+                                    return "French";
+                                }
+                                else {
+                                    return "";
+                                }
+                            }
+                           
+
+                        }
+
+
+                    }
+
+                ],
+                "initComplete": function(data, json) {
+                    $(".loader").hide();
+                },
+                "responsive": "true",
+                //"serverSide": "true",
+                "order": [0, "desc"],
+                //"searchDelay": 350,
+                //"filter": "true",
+                /// "processing": "true",
+                "destroy": "true",
+                "searching": "true",
+                "language": {
+                    //"processing": 'Processing- please wait'
+
+                }
+            });
+
+            //$('#bannerTable_filter').hide();
+            //$('#bannerTable_length').hide();
+        }
+
+        //Delete the banner Records
+        function BannerDel(id) {
+            var url = id;
+            var arrUrl = url.split("/");
+            var guid = arrUrl[3];
+            if (confirm("Do you want to delete the Home Banner-" + guid + "?")) {
+                this.click;
+                //alert("Ok");
+                $.ajax({
+                    type: "Get",
+                    url: url,
+                    data: { guid, guid },
+                    success: function(data) {
+                        if (data != null) {
+
+                            if (data.data.isSuccessfull === true && data.data.formMode === "Delete") {
+                                getBannerList();
+                                toastr.success(data.data.message);
+                            }
+                            else if (data.data.formMode === "Edit" && data.data.isSuccessfull === true) {
+                                toastr.success(data.data.message);
+                            }
+                            else {
+                                toastr.error(data.data.message);
+                            }
+                        }
+                        else {
+                            // $("#dvErrorAuth").html("FE: Something went wrong");
+                            toastr.error(data.data.message);
+                        }
+
+                    },
+                    error: function(exp) {
+                        alert(exp.responseText);
+                    },
+                    cache: false,
+                    contentType: false,
+                    processData: false
+
+                });
+            }
+            else {
+                //alert("Cancel");
+                toastr.error("Homer Page Banner Deleted Query Cancel.");
+            }
+            event.preventDefault();
+
+        }
+    </script>
+    @*<script type="text/javascript">
+
+        $(document).ready(function() {
+            ValidateRules();
+            //$(document).on("preInit.dt", function() {
+            //    $(".dataTables_filter input[type='search']").attr("minlength", 3);
+
+            //});
+            //$("#bannerupload").validate({
+            //    rules: {
+            //        bannerFile: "required",
+            //        BannerTitle: "required",
+            //        ImageName: "required",
+            //        statusSelect: "required"
+            //    },
+            //    messages: {
+            //        bannerFile: "Please upload your File",
+            //        BannerTitle: "Please enter your Title",
+
+            //        agree: "Please select Status"
+            //    },
+            //    errorElement: "em",
+            //    errorPlacement: function(t, e) {
+            //        t.addClass("invalid-feedback"), "checkbox" === e.prop("type") ? t.insertAfter(e.next("label")) : t.insertAfter(e),
+            //            t.addClass("invalid-feedback"), "file" === e.prop("type") ? t.insertAfter(e.next("label")) : t.insertAfter(e)
+            //    },
+            //    //highlight: function(e, i, n) {
+            //    //    t(e).addClass("is-invalid").removeClass("is-valid")
+            //    //},
+            //    //unhighlight: function(e, i, n) {
+            //    //    t(e).addClass("is-valid").removeClass("is-invalid")
+            //    //}
+            //})
+
+            //$('#bannerTable').DataTable({
+            //    pageLength: 10,
+            //    filter: true,
+            //    deferRender: true,
+            //    scrollY: 200,
+            //    scrollCollapse: true,
+            //    scroller: true
+            //})
+
+            var title = "";
+            var image = "";
+            var view = "";
+            var Status = "";
+            var ad_hyperlink = "";
+
+            $('#bannerTable').DataTable({
+                "ajax": {
+                    "url": "/Banner/BannerList",
+                    "type": "Post",
+                    "data": { title: title, image: image, view: view, Status: Status, ad_hyperlink: ad_hyperlink },
+                    "datatype": "json",
+                },
+                "columns": [
+
+                    { "data": "banner_id", "name": "banner_id" },
+                    { "data": "title", "name": "title" },
+                    { "data": "image", "name": "image" },
+                    { "data": "view", "name": "view" },
+                    { "data": "status", "name": "status" },
+                    { "data": "ad_hyperlink", "name": "ad_hyperlink" },
+                    { "data": "Action", "name": "non" }
+                ],
+                "columnDefs": [
+                    {
+                        "targets": 6,
+                        "data": null,
+                        "orderable": true,
+                        "render": function(data, type, full, meta) {
+
+                            var viewUrl = "'/Banner/Detail/" + full.banner_id + "'";
+                            var editUrl = "'/Banner/Edit/" + full.banner_id + "'";
+                            var delUrl = "'/Banner/Delete/" + full.banner_id + "'";
+                            var edit = '<div style="font-family: cursive;display: inline-flex; white-space:normal;overflow:hidden;"> \n'
+                            edit = edit + '<button class="mb-2 mr-2 btn-icon btn-icon-only btn btn-primary" onclick="BannerEdit(' + full.banner_id + ')" title = "Edit Banner"><i class="pe-7s-pen btn-icon-wrapper"></i></button>'
+                                + '<button class="mb-2 mr-2 btn-icon btn-icon-only btn btn-warning" onclick="BannerView(' + full.banner_id + ')" title = "View Banner"><i class="pe-7s-look btn-icon-wrapper"></i></button>'
+                                + '<button class="mb-2 mr-2 btn-icon btn-icon-only btn btn-danger" onclick="BannerDel(' + full.banner_id + ')" title = "Delete Banner"><i class="pe-7s-trash btn-icon-wrapper"></i></button>'
+
+                            //var editurl = '<div class="dropdown" style="text-align: center;"> \n'
+                            //if (full.View) {
+                            //    editurl = editurl + '<a href="/Banner/' + full.BannerId + '" class="view_banner" title="View Banner"> <span class="icon-wrapper icon-wrapper-alt rounded-circle"> <i class="pe-7s-look text-focus opacity-7 btn-icon-wrapper"> </i> </span> </a> \n'
+                            //}
+                            //if (full.Edit) {
+                            //    editurl = editurl + '<a href = "javascript:" onclick="Banner(' + editUrl + ')" class="view_banner" title = "Edit Banner" > <span class="icon-wrapper icon-wrapper-alt rounded-circle"> <i class="text-focus opacity-7 btn-icon-wrapper pe-7s-pen"> </i> </span> </a > \n'
+                            //}
+
+                            '</div ></td > '
+
+
+                            return edit;
+                        }
+                    },
+                ],
+                //"initComplete": function(data, json) {
+                //    //$(".loader").hide();
+                //},
+                "responsive": "true",
+                "serverSide": "true",
+                "order": [0, "desc"],
+                //"searchDelay": 350,
+                "filter": "true",
+                /// "processing": "true",
+                "destroy": "true",
+                "searching": "true",
+                "language": {
+                    //"processing": 'Processing- please wait'
+
+                }
+            });
+
+        });
+
+        function btnPublish() {
+
+            //var formData = new FormData($('#bannerupload')[0]);
+            var url = "/Banner/Publish";
+            //var img = "imgdata.BannerImage";
+            $.ajax({
+                type: "Get",
+                url: url,
+                //data: formData,
+                success: function(data) {
+                    if (data != null) {
+                        if (data.data.isSuccessfull === true) {
+
+                            toastr.success(data.data.message);
+                            $('#modalCMS').modal('hide');
+                        }
+                        else {
+                            toastr.error(data.data.message);
+                        }
+                    }
+                    else {
+                        // $("#dvErrorAuth").html("FE: Something went wrong");
+                    }
+                },
+                error: function(exp) {
+                    alert(exp.responseText);
+                }
+            });
+        }
+
+        function NewBanner() {
+            var url = "/Banner/Create";
+            $.ajax({
+                type: "Get",
+                url: url,
+                success: function(data) {
+                    $.fn.modal.Constructor.prototype.enforceFocus = function() { };
+                    $('#modalCMS').html(data);
+                    $('#modalCMS').modal('show');
+                    publishDisableButton();
+
+                    //mask();
+                    //$('select').each(function () {
+                    //    if ($(this).hasClass('js-source-states')) {
+                    //        $(this).select2();
+                    //    }
+                    //});
+                    ValidateRules();
+                }
+            });
+        }
+
+        function saveBanner() {
+
+            if ($('#bannerupload').valid()) {
+                var url = "";
+                var formData = new FormData($('#bannerupload')[0]);
+                var urlEdit = $('#bannerupload').attr('action');
+                var formMode = ('#formMode').value;
+                if (formMode === "Edit") {
+                    url = "/Banner/Edit" + formData;
+                }
+                else {
+                    url = $('#bannerupload').attr('action');
+                }
+                $.ajax({
+                    type: "POST",
+                    url: url,
+                    data: formData,
+                    success: function(data) {
+                        $.fn.modal.Constructor.prototype.enforceFocus = function() { };
+                        publishEnableButton();
+                        window.open("https://mldev-01-staging.azurewebsites.net/", "", 'scrollbars=yes,toolbar=yes,menubar=yes,width=700,height=800');
+                        if (data.data != null) {
+                            if (data.data.isSuccessfull === true && data.data.formMode === "Create") {
+
+                                toastr.success(data.data.message);
+                                //data.bannerimgdata = 'TempData["mainimg"]';
+                                //window.open('https://mldev-01-staging.azurewebsites.net/', 'popup', 'width=600,height=600');
+                            }
+                            else if (data.data.formMode === "Edit" && data.data.isSuccessfull === true) {
+                                toastr.success(data.data.message);
+                            }
+                            else {
+                                toastr.error(data.data.message);
+                            }
+                        }
+                        else {
+                            // $("#dvErrorAuth").html("FE: Something went wrong");
+                            toastr.error(data.data.message);
+                        }
+                    },
+                    error: function(exp) {
+                        alert(exp.responseText);
+                    },
+                    cache: false,
+                    contentType: false,
+                    processData: false
+                });
+            }
+        }
+
+        function updateBanner() {
+
+            var url = "";
+            var formData = new FormData($('#bannerupload')[0]);
+            //var urlEdit = $('#bannerupload').attr('action');
+            var formMode = ('#formMode').value;
+
+            url = "/Banner/Edit";
+
+            $.ajax({
+                type: "POST",
+                url: url,
+                data: formData,
+                success: function(data) {
+                    $.fn.modal.Constructor.prototype.enforceFocus = function() { };
+                    publishEnableButton();
+                    window.open("https://mldev-01-staging.azurewebsites.net/", "", 'scrollbars=yes,toolbar=yes,menubar=yes,width=700,height=800');
+                    if (data != null) {
+                        if (data.isSuccessfull === true && data.formMode === "Create") {
+
+                            toastr.success(data.message);
+                            //data.bannerimgdata = 'TempData["mainimg"]';
+                            //window.open('https://mldev-01-staging.azurewebsites.net/', 'popup', 'width=600,height=600');
+                        }
+                        else if (data.formMode === "Edit" && data.isSuccessfull === true) {
+                            toastr.success(data.message);
+                        }
+                        else {
+                            toastr.error(data.message);
+                        }
+                    }
+                    else {
+                        // $("#dvErrorAuth").html("FE: Something went wrong");
+                        toastr.error(data.message);
+                    }
+                },
+                error: function(exp) {
+                    alert(exp.responseText);
+                },
+                cache: false,
+                contentType: false,
+                processData: false
+            });
+        }
+
+        function closeModal() {
+            $('#modalCMS').modal('hide');
+        }
+
+        function newPop(data) {
+            var data = data;
+            window.open("https://mldev-01-staging.azurewebsites.net", "popupWindow", "width=600,height=600,scrollbars=yes");
+        }
+
+        function publishHideButton() {
+            $("#publish").hide();
+        }
+
+        function publishShowButton() {
+            $("#publish").show();
+        }
+
+        function publishDisableButton() {
+            $("#publish").prop("disabled", true);
+        }
+
+        function publishEnableButton() {
+            $("#publish").prop("disabled", false);
+        }
+
+        function BannerEdit(id) {
+            var url = "/Banner/Edit/?id=" + id;
+            $.ajax({
+                type: "Get",
+                url: url,
+                success: function(data) {
+                    $.fn.modal.Constructor.prototype.enforceFocus = function() { };
+                    $('#modalCMS').html(data);
+                    $('#modalCMS').modal('show');
+                    publishDisableButton();
+                }
+            });
+        }
+
+        function BannerView(id) {
+            var url = "/Banner/Details/?id=" + id;
+            $.ajax({
+                type: "Get",
+                url: url,
+                success: function(data) {
+                    $.fn.modal.Constructor.prototype.enforceFocus = function() { };
+                    $('#modalCMS').html(data);
+                    $('#modalCMS').modal('show');
+                    publishDisableButton();
+                }
+            });
+        }
+
+        //Delete the banner Records
+        function BannerDel(id) {
+            var url = "/Banner/Delete/?id=" + id;
+            if (confirm("Do you want to delete the Home Banner-" + id + "?")) {
+                this.click;
+                //alert("Ok");
+                $.ajax({
+                    type: "Get",
+                    url: url,
+                    success: function(data) {
+                        if (data != null) {
+
+                            if (data.data.isSuccessfull === true && data.data.formMode === "Delete") {
+
+                                toastr.success(data.data.message);
+                            }
+                            else if (data.data.formMode === "Edit" && data.data.isSuccessfull === true) {
+                                toastr.success(data.data.message);
+                            }
+                            else {
+                                toastr.error(data.data.message);
+                            }
+                        }
+                        else {
+                            // $("#dvErrorAuth").html("FE: Something went wrong");
+                            toastr.error(data.data.message);
+                        }
+
+                    },
+                    error: function(exp) {
+                        alert(exp.responseText);
+                    },
+                    cache: false,
+                    contentType: false,
+                    processData: false
+
+                });
+            }
+            else {
+                //alert("Cancel");
+                toastr.error("Homer Page Banner Deleted Query Cancel.");
+            }
+            event.preventDefault();
+
+        }
+
+
+    </script>*@
+
+    
+    }
+
+    @*<script src="~/assets/js/jquery-3.3.1.min.js"></script>*@
+    @*<script src="/assets/scripts/main.8d288f825d8dffbbe55e.js"></script>*@
+    @*<script type="text/javascript" src="/js/Banners.js"></script>*@

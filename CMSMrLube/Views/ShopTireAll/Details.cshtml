@@ -1,0 +1,112 @@
+﻿@model CMS.Core.DTOs.ShopTireDto
+@inject IConfiguration _configuration
+@{
+    var AzureBlob = _configuration.GetSection("AzureBlob").Value;
+    var bannerpath = "/img/ShopTires/";
+    ViewBag.Title = "View";
+    Layout = null;
+    var dt1 = Model.CreatedDate.Value;
+    //DateTime LTime = new DateTime(dt1);
+    var dt2 = dt1.ToLocalTime();
+    var serverTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Eastern Standard Time");
+    var localTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Pakistan Standard Time");
+
+    var getTiem = TimeZoneInfo.ConvertTimeToUtc(dt1, serverTimeZone);
+    //var LocalTimeUTC = TimeZoneInfo.ConvertTimeToUtc(dt1.ToUniversalTime(),TimeZoneInfo.Local);
+    //var LocalTimeUTC = TimeZoneInfo.ConvertTimeBySystemTimeZoneId(DateTime.Now.ToLocalTime(), TimeZoneInfo.Local.Id);
+    var localTime = TimeZoneInfo.ConvertTime(dt1, serverTimeZone, localTimeZone);
+
+
+    //long dt1 = Model.CreatedDate.Value.ToFileTime();
+
+
+
+    //DateTimeOffset localTime = new DateTimeOffset(new DateTime(dt1));
+    //DateTimeOffset otherTime = localTime.ToOffset(TimeSpan.Zero);
+    //DateTimeOffset UnicersalTime = otherTime.ToUniversalTime();
+
+    //DateTime dt4 = TimeZone.CurrentTimeZone.ToUniversalTime(dt1).ToUniversalTime();
+    //DateTime dt5 = TimeZoneInfo.ConvertTimeFromUtc(dt4, TimeZoneInfo.Local);
+    //DateTime dt3 = TimeZone.CurrentTimeZone.ToLocalTime(dt4);
+    //DateTime dt2 = TimeZoneInfo.ConvertTimeBySystemTimeZoneId(dt1,TimeZoneInfo.Local.Id);
+    //DateTime dt1 = TimeZone.CurrentTimeZone.ToLocalTime(Model.CreatedDate.Value).ToUniversalTime();
+    string dFormat = dt1.ToString("dd MMM yyyy HH:mm:ss");
+    TimeZoneInfo tzi = TimeZoneInfo.FindSystemTimeZoneById(TimeZoneInfo.Local.Id);
+}
+
+<div class="modal-dialog modal-lg">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h4 class="modal-title" id="modalCMSLabel">Shop Tire Details</h4>
+            @*<button type="button" class="close" data-bs-dismiss="modal" aria-label="Close" aria-hidden="true">&times;</button>*@
+            <button id="btnCloseDetail" data-dismiss="modal" type="button" class="close" aria-label="Close" aria-hidden="true" onclick="closeModal();">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        <div class="modal-body">
+
+            <div class="row" style="border-bottom: 1px solid grey;">
+                @*<img src="~/assets/images/logo-full.png" style="width:100%; height:100%"/>*@
+                @*<label class="col-md-2 col-form-label form-control-label" style="font-weight:600; background-color: #f8f9fa; border-bottom: 1px solid grey;">Image Name:</label>*@
+                <label class="col-lg-3 pt-3 pb-2" style="margin-bottom: 0px; font-weight:600; background-color:#e8e6e3; "><i class="fas fa-id-badge" style="width:20%;"></i><span style=width:25%>ShopTire Id:</span></label>
+                <label class="col-lg-3 pt-3 pb-2" style="margin-bottom: 0px; font-weight:500; background-color: #f8f9fa; ">@Model.ShopTireId</label>
+                <label for="@Model.ImageName" class="col-lg-2" style="word-wrap: break-word; margin-bottom: 0px; font-weight:500; background-color: #f8f9fa; "></label>
+                @{
+                    @if (@Model.ViewDevice == "desktop")
+                    {
+                        var img = AzureBlob + bannerpath + @Model.ImageName;
+                        <div class="col-md-4" style="display:block; text-align:center;background-color: #f8f9fa;">
+                            <img src="@Url.Content(img)" style="height:55px; width:100%; padding-top: 0px; padding-left: 0px; background-color: #f8f9fa; border-bottom: " asp-append-version="true" />
+                        </div>
+                    }
+                    else
+                    {
+                        var img = AzureBlob + bannerpath + @Model.ImageName;
+                        <div class="col-md-4" style="display:block; text-align:center;background-color: #f8f9fa;">
+                            <img src="@Url.Content(img)" style="height:95%; width:80%; padding-top: 0px; padding-left: 0px; background-color: #f8f9fa; " asp-append-version="true" />
+                        </div>
+                    }
+                }
+                @*<img src="@Url.Content("~/" + @Model.ImageName)" class="col-md-4" height="80" width="140" style="padding-top: 0px; padding-left: 0px; background-color: #f8f9fa; border-bottom: 1px solid grey;" asp-append-version="true" />*@
+            </div>
+
+            <div class="row">
+                <label class="col-lg-3 pt-3 pb-2" style="margin-bottom: 0px; font-weight:600; background-color:#e8e6e3; border-bottom: 1px solid grey;"><i class="fa fa-language" style="width:20%;"></i><span style="width:25%;">Language:</span></label>
+                <label class="col-lg-3 pt-3 pb-2" style="margin-bottom: 0px; font-weight:500; background-color: #f8f9fa; border-bottom: 1px solid grey;">@Model.Language</label>
+                <label class="col-lg-3 pt-3 pb-2" style="margin-bottom: 0px; font-weight:600; background-color: #e8e6e3; border-bottom: 1px solid grey;"><i class="fas fa-store" style="width:20%;"></i><span style="width:25%;">Stores No #</span></label>
+                <label class="col-lg-3 pt-3 pb-2" style="margin-bottom: 0px; font-weight:500; background-color: #f8f9fa; border-bottom: 1px solid grey;">@Model.Stores</label>
+            </div>
+            <div class="row">
+                <label class="col-lg-3 pt-3 pb-2" style="margin-bottom: 0px; font-weight:600; background-color:#e8e6e3; border-bottom: 1px solid grey;"><i class="fa fa-pen" style="width:20%;"></i><span style="width:25%;">Title:</span></label>
+                <label class="col-lg-3 pt-3 pb-2" style="word-wrap: break-word; margin-bottom: 0px; font-weight:500; background-color: #f8f9fa; border-bottom: 1px solid grey;">@Model.Title</label>
+                <label class="col-lg-3 pt-3 pb-2" style="margin-bottom: 0px; font-weight:600; background-color: #e8e6e3; border-bottom: 1px solid grey;"><i class="fas fa-file-image" style="width:20%;"></i><span style="width:25%;">Image Name:</span></label>
+                <label class="col-lg-3 pt-3 pb-2" style="word-wrap: break-word; margin-bottom: 0px; font-weight:500; background-color: #f8f9fa; border-bottom: 1px solid grey;">@Model.ImageName</label>
+            </div>
+
+            <div class="row">
+                <label class="col-lg-3 pt-3 pb-2" style="margin-bottom: 0px; font-weight:600; background-color:#e8e6e3; border-bottom: 1px solid grey;"><i class="fa fa-info" style="width:20%;"></i><span style="width:25%;">Image Status:</span></label>
+                <label class="col-lg-3 pt-3 pb-2" style="margin-bottom: 0px; font-weight:500; background-color: #f8f9fa; border-bottom: 1px solid grey;">@Model.ImageStatus</label>
+                <label class="col-lg-3 pt-3 pb-2" style="margin-bottom: 0px; font-weight:600; background-color: #e8e6e3; border-bottom: 1px solid grey;"><i class="fa fa-tablet" style="width:20%;"></i><span style="width:25%;">View Device:</span></label>
+                <label class="col-lg-3 pt-3 pb-2" style="margin-bottom: 0px; font-weight:500; background-color: #f8f9fa; border-bottom: 1px solid grey;">@Model.ViewDevice</label>
+            </div>
+            <div class="row">
+                <label class="col-lg-3 pt-3 pb-2" style="margin-bottom: 0px; font-weight:600; background-color:#e8e6e3; border-bottom: 1px solid grey;"><i class="fa fa-user" style="width:20%;"></i><span style="width:25%;">Last User:</span></label>
+                <label class="col-lg-3 pt-3 pb-2" style="margin-bottom: 0px; font-weight:500; background-color: #f8f9fa; border-bottom: 1px solid grey;">@Model.LastUser</label>
+                <label class="col-lg-3 pt-3 pb-2" style="margin-bottom: 0px; font-weight:600; background-color: #e8e6e3; border-bottom: 1px solid grey;"><i class="fas fa-link" style="width:20%;"></i><span style="width:25%;">HyperLink:</span></label>
+                <label class="col-lg-3 pt-3 pb-2" style="word-wrap: break-word; margin-bottom: 0px; font-weight:500; background-color: #f8f9fa; border-bottom: 1px solid grey;">@Model.Hyperlink</label>
+            </div>
+            <div class="row">
+                <label class="col-lg-3 pt-3 pb-2" style="font-weight:600; padding-left: 10px; background-color:#e8e6e3; border-bottom: 1px solid grey;"><i class="fa fa-calendar" style="width:20%;"></i><span style="width:25%;">Created Date:</span></label>
+                <label class="col-lg-3 pt-3 pb-2" style="font-weight:500; background-color: #f8f9fa; border-bottom: 1px solid grey;">@TimeZoneInfo.ConvertTimeToUtc(Model.CreatedDate.Value,serverTimeZone).ToString("dd MMM yyyy HH:mm:ss")</label>
+                <label class="col-lg-3 pt-3 pb-2" style="font-weight:600; padding-left: 10px; background-color: #e8e6e3; border-bottom: 1px solid grey;"><i class="fa fa-calendar" style="width:20%;"></i><span style="width:25%;">Update Date:</span></label>
+                <label class="col-lg-3 pt-3 pb-2" style="font-weight:500; background-color: #f8f9fa; border-bottom: 1px solid grey;">@TimeZoneInfo.ConvertTimeToUtc(Model.UpdatedDate.Value,serverTimeZone).ToString("dd MMM yyyy HH:mm:ss")</label>
+            </div>
+            @*
+            <div class="form-group view-label row">
+            <label class="col-lg-2 col-form-label form-control-label line-height-9 pt-2 text-2 leftbg">@FormLabels.Contactnumber:</label>
+            <label class="col-lg-4 col-form-label form-control-label line-height-9 pt-2 text-2">@Model.AreaPhone_View</label>
+            </div>*@
+        </div>
+    </div>
+
+</div>

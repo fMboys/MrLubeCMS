@@ -1,0 +1,448 @@
+﻿@using MrLubeCMS.ViewModels
+@using System.Text.RegularExpressions
+@inject IConfiguration _configuration;
+@model VMLeftAd;
+@using static IWebHostEnvironment
+@{
+    var AzureBlob = _configuration.GetSection("AzureBlob").Value;
+    var bannerpath = "/img/ads/";
+    var image = TempData["mainImage"];
+    var selectedPages = Model.SubMenus;
+    var checkedPages = ViewBag.checkedPages;
+    var leftAdPages = ViewBag.LeftAdPages;
+
+    var mwidth = ViewBag.mwidth;
+    var mheight = ViewBag.mheight;
+    var dwidth = ViewBag.dwidth;
+    var dheight = ViewBag.dheight;
+
+    Layout = null;
+}
+
+<div class="modal-dialog" role="document">
+
+    <div class="modal-content">
+        <form asp-action="SaveLeftAd" id="formLeftAd" method="post" enctype="multipart/form-data">
+            <div class="modal-header">
+                @if (ViewBag.Title == "Edit")
+                {
+                    <h5 class="modal-title" id="modalCMSLabel">Edit Left Ad Image Details</h5>
+                }
+                else
+                {
+                    <h5 class="modal-title" id="modalCMSLabel">Add Left Ad Image Details</h5>
+                }
+
+                <button type="button" class="close" data-bs-dismiss="modal" aria-hidden="true" onclick="closeModal();">&times;</button>
+            </div>
+
+            <div class="modal-body">
+                @{
+                    <input id="hdnStaggingDomain" type="hidden" value="@_configuration["StagingDomain"]" />
+                    <input id="hdnProdDomain" type="hidden" value="@_configuration["ProdDomain"]" />
+                }
+                <ul class="nav nav-tabs" style="font-size:17px">
+                    <li class="tabs active"><a data-toggle="tab" class="active nav-link" href="#tabDetail"> <i class="fa fa-user"></i> Details</a></li>
+                    @{
+
+                        var engpage = "English Pages";
+                        var frpage = "French Pages";
+                        if (ViewBag.Title == "Create")
+                        {
+                            @if (ViewBag.lang == 1)
+                            {
+                                <li class="tabs"><a data-toggle="tab" class="nav-link" href="#tabPage"><i class="fa fa-clipboard"></i> @engpage </a></li>
+                            }
+                            else if (ViewBag.lang == 2)
+                            {
+                                <li class="tabs"><a data-toggle="tab" class="nav-link" href="#tabPage"><i class="fa fa-clipboard"></i> @frpage </a></li>
+                            }
+                        }
+                        else if (ViewBag.Title == "Edit")
+                        {
+                            @if (Model.LeftAdDto.LanguageId == 1)
+                            {
+                                <li class="tabs"><a data-toggle="tab" class="nav-link" href="#tabPage"><i class="fa fa-clipboard"></i> @engpage </a></li>
+                            }
+                            else if (Model.LeftAdDto.LanguageId == 2)
+                            {
+                                <li class="tabs"><a data-toggle="tab" class="nav-link" href="#tabPage"><i class="fa fa-clipboard"></i> @frpage </a></li>
+                            }
+                        }
+
+                    }
+                    @*<li class="tabs"><a data-toggle="tab" class="nav-link" href="#tabPage"><i class="fa fa-clipboard"></i> Pages</a></li>*@
+                </ul>
+                <div class="tab-content" style=" margin-top:14px">
+                    <div id="tabDetail" class="tab-pane active">
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <fieldset>
+                                    <div class="row">
+                                        <div class="form-group col-md-6">
+                                            <div class="position-relative form-group">
+                                                <label asp-for="@Model.LeftAdDto.ViewDevice" class="form-label mb-1 text-2">Select View Device</label>
+                                                <select asp-for="@Model.LeftAdDto.ViewDevice" name="viewDevice" id="viewDevice" class="form-control" readonly onchange="toggleHintText();">
+                                                    @{
+                                                        if (Model.LeftAdDto.ViewDevice != null)
+                                                        {
+                                                            if (Model.LeftAdDto.ViewDevice == "desktop")
+                                                            {
+                                                                <option selected>Desktop</option>
+                                                                //<option>Mobile</option>
+                                                            }
+                                                            else if (Model.LeftAdDto.ViewDevice == "mobile")
+                                                            {
+                                                                <option selected>Mobile</option>
+                                                                //<option>Desktop</option>
+                                                            }
+                                                        }
+                                                        else
+                                                        {
+                                                            @if (ViewBag.views == "desktop")
+                                                            {
+                                                                <option selected>Desktop</option>
+                                                            }
+                                                            else if (ViewBag.views == "mobile")
+                                                            {
+                                                                <option selected>Mobile</option>
+                                                            }
+
+                                                        }
+                                                    }
+                                                    @*<option>Desktop</option>
+                                                    <option>Mobile</option>*@
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="position-relative form-group col-md-6">
+                                            <label for="FloatingImageFile">Upload Left Ad Image File</label>
+                                            <div class="col-sm-8">
+                                                <input asp-for="@Model.LeftAdDto.ImageName" type="file" accept="*/*" name="imageFile" id="imageFile" class="form-control-file" value="" onchange="validateFileResolution(this,event);" onclick="FileOnClick(event);" />
+                                            </div>
+                                            @{
+                                                if (ViewBag.Title == "Edit")
+                                                {
+                                                    @if (Model.LeftAdDto.ViewDevice == "desktop")
+                                                    {
+                                                        <small class="form-text text-muted" id="txtImageHint">Please select an image of Resolution @dwidth px x @dheight px.</small>
+                                                    }
+                                                    else if (Model.LeftAdDto.ViewDevice == "mobile")
+                                                    {
+                                                        <small class="form-text text-muted" id="txtImageHint">Please select an image of Resolution @mwidth px x @mheight px.</small>
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    @if (ViewBag.views == "desktop")
+                                                    {
+                                                        <small class="form-text text-muted" id="txtImageHint">Please select an image of Resolution @dwidth px x @dheight px.</small>
+                                                    }
+                                                    else if (ViewBag.views == "mobile")
+                                                    {
+                                                        <small class="form-text text-muted" id="txtImageHint">Please select an image of Resolution @mwidth px x @mheight px.</small>
+                                                    }
+                                                }
+
+                                            }
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            @{
+                                                @if (@Model.LeftAdDto.ImageName != null)
+                                                {
+                                                    if (@Model.LeftAdDto.ViewDevice == "desktop")
+                                                    {
+                                                        <div style="display:block; margin-bottom:5px;text-align:center;">
+                                                            <img src="@Url.Content(AzureBlob + bannerpath + @Model.LeftAdDto.ImageName)" class="" style="height:60%; width:45%;" asp-append-version="true" />
+                                                        </div>
+                                                    }
+                                                    else
+                                                    {
+                                                        <div style="display:block; margin-bottom:5px;text-align:center;">
+                                                            <img src="@Url.Content(AzureBlob + bannerpath + @Model.LeftAdDto.ImageName)" class="" style="height:60%; width:45%;" asp-append-version="true" />
+                                                        </div>
+                                                    }
+
+                                                }
+                                            }
+                                        </div>
+                                        <div class="col-md-6">
+
+                                            @{
+                                                if (ViewBag.Title == "Edit")
+                                                {
+                                                    <label for="@Model.LeftAdDto.ImageName" style="margin-left: 10px; text-align:center; ">@Model.LeftAdDto.ImageName</label>
+                                                }
+
+                                                <input for="@ViewBag.Title" type="hidden" id="formMode" name="formMode" class="form-control-file" value="@ViewBag.Title" />
+                                                <input for="@Model.LeftAdDto.ImageName" type="hidden" id="imageUpload" name="imageUpload" class="form-control-file" value="@Model.LeftAdDto.ImageName" />
+                                                <input asp-for="@Model.LeftAdDto.Id" type="hidden" id="leftAdID" name="leftAdID" class="form-control-file" value="@Model.LeftAdDto.Id" />
+                                                <input asp-for="@Model.LeftAdDto.guid" type="hidden" id="leftAdGUID" name="leftAdGUID" class="form-control-file" value="@Model.LeftAdDto.guid" />
+                                            }
+                                        </div>
+                                    </div>
+
+
+                                    <div class="row">
+                                        <div class="form-group col-md-6">
+                                            <label asp-for="@Model.LeftAdDto.Title" class="form-label mb-1 text-3">Title</label>
+                                            <div class="position-relative">
+                                                <i class="fa fa-pen text-color-primary text-3 position-absolute" style="padding: 12px 5px 0px 10px;"></i>
+                                                <input asp-for="@Model.LeftAdDto.Title" name="titleImage" id="titleImage" placeholder="Title" type="text" class="form-control" style="padding-left:45px;" aria-describedby="titleImage-error" />
+                                                <em id="titleImage-error" class="error invalid-feedback">Enter Title for Image.</em>
+                                            </div>
+                                        </div>
+                                        <div class="form-group col-md-6">
+                                            <label asp-for="@Model.LeftAdDto.Hyperlink" class="form-label mb-1 text-2">Image HyperLink</label>
+                                            <div class="position-relative">
+                                                <i class="fas fa-link text-color-primary text-3 position-absolute" style="padding: 12px 5px 0px 10px;"></i>
+                                                <input asp-for="@Model.LeftAdDto.Hyperlink" name="imageHyperLink" id="imageHyperLink" placeholder="HyperLink" type="text" class="form-control" style="padding-left:45px;" aria-describedby="imageHyperLinkError" />
+                                                <em id="imageHyperLinkError" class="error invalid-feedback">Enter hyperlink for image.</em>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="form-group col-md-6">
+                                            <div class="position-relative form-group">
+                                                <label asp-for="@Model.LeftAdDto.ImageStatus" class="form-label mb-1 text-2">Select Status</label>
+                                                <select asp-for="@Model.LeftAdDto.ImageStatus" name="imageStatus" id="imageStatus" class="form-control" onchange="checkActiveImagePages()">
+                                                    <option>Active</option>
+                                                    <option>Inactive</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="form-group col-md-6">
+                                            <div class="position-relative form-group">
+                                                <label asp-for="@Model.LeftAdDto.LanguageId" class="form-label mb-1 text-2">Choose your preferred language</label>
+                                                <select asp-for="@Model.LeftAdDto.LanguageId" name="language" id="language" class="form-control" readonly>
+                                                    @{
+                                                        if (Model.LeftAdDto.LanguageId != 0)
+                                                        {
+                                                            if (Model.LeftAdDto.LanguageId == 1)
+                                                            {
+                                                                <option selected>English</option>
+                                                                //<option>French</option>
+                                                            }
+                                                            else if (Model.LeftAdDto.LanguageId == 2)
+                                                            {
+                                                                <option selected>French</option>
+                                                                //<option>English</option>
+                                                            }
+                                                        }
+                                                        else
+                                                        {
+                                                            @if (ViewBag.lang == 1)
+                                                            {
+                                                                <option selected>English</option>
+                                                            }
+                                                            else if (ViewBag.lang == 2)
+                                                            {
+                                                                <option selected>French</option>
+                                                            }
+
+                                                        }
+                                                    }
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </fieldset>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!--Tab Page-->
+
+                    <div id="tabPage" class="tab-pane">
+                        <input asp-for="@Model.LeftAdDto.selectedPages" type="hidden" id="selectedPages" name="selectedPages" class="form-control-file" value="@Model.LeftAdDto.selectedPages" />
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <fieldset>
+                                    @{
+
+                                        var eng = "English Pages";
+                                        var fr = "French Pages";
+                                        if (ViewBag.Title == "Create")
+                                        {
+                                            @if (ViewBag.lang == 1)
+                                            {
+                                                <legend>@eng</legend>
+                                            }
+                                            else if (ViewBag.lang == 2)
+                                            {
+                                                <legend>@fr</legend>
+                                            }
+
+                                        }
+                                        else if (ViewBag.Title == "Edit")
+                                        {
+                                            @if (Model.LeftAdDto.LanguageId == 1)
+                                            {
+                                                <legend>@eng</legend>
+                                            }
+                                            else if (Model.LeftAdDto.LanguageId == 2)
+                                            {
+                                                <legend>@fr</legend>
+                                            }
+                                        }
+
+                                    }
+
+                                    <input type="checkbox" id="selectAll" name="text" onchange="toggleAll(this);" />
+                                    <label>Select All</label>
+                                    <div id="listPages" class="row col-md-12 checkbox-group required">
+                                        <label id="lblCbxValidate"></label>
+                                        @{
+                                            foreach (var item in Model.SubMenus)
+                                            {
+                                                if (item.item_id != 3 && item.item_id != 10 && item.item_id != 34)
+                                                {
+                                                    if (ViewBag.Title == "Create")
+                                                    {
+                                                        if (ViewBag.leftAdPages != null)
+                                                        {
+                                                            string reg = @Regex.Replace(item.title, @"\s+", "");
+
+                                                            <div class="col-md-6">
+                                                                @{
+                                                                    string isActive = "";
+                                                                    foreach (var check in ViewBag.leftAdPages)
+                                                                    {
+                                                                        if (@item.url_key == check.url_key && @item.url_key != "home" && item.item_id != 3 && item.item_id != 10)
+                                                                        {
+                                                                            isActive = "disabled";
+                                                                        }
+                                                                    }
+                                                                    if (isActive == "disabled")
+                                                                    {
+                                                                        <input id="cbxPage" type="checkbox" class="cbxMark" disabled="@isActive" name="@reg" value="@item.sub_menu_id" />
+                                                                        <label for="@reg">@item.title</label>
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        if (item.url_key != "home" && item.item_id != 3 && item.item_id != 10)
+                                                                        {
+                                                                            <input id="cbxPage" type="checkbox" class="cbxMark" onchange="syncSelectAll();" name="@reg" value="@item.sub_menu_id">
+                                                                            <label for="@reg">@item.title</label>
+                                                                        }
+
+                                                                    }
+                                                                }
+
+                                                            </div>
+                                                        }
+                                                        else
+                                                        {
+                                                            string reg = @Regex.Replace(@item.title, @"\s+", "");
+
+                                                            <div class="col-md-6">
+                                                                <input id="cbxPage" type="checkbox" class="cbxMark" onchange="syncSelectAll();" name="@reg" value="@item.sub_menu_id">
+                                                                <label for="@reg">@item.title</label>
+                                                            </div>
+                                                        }
+                                                    }
+                                                    else if (ViewBag.Title == "Edit")
+                                                    {
+                                                        if (ViewBag.checkedPages != null && leftAdPages != null)
+                                                        {
+                                                            string reg = @Regex.Replace(item.title, @"\s+", "");
+
+                                                            <div class="col-md-6">
+                                                                @{
+                                                                    string isActive = "";
+                                                                    string isChecked = "";
+
+                                                                    foreach (var check in leftAdPages)
+                                                                    {
+                                                                        if (@item.url_key == check.url_key && @item.url_key != "home" && item.item_id != 3 && item.item_id != 10)
+                                                                        {
+                                                                            isActive = "disabled";
+                                                                        }
+                                                                    }
+                                                                    foreach (var check in ViewBag.checkedPages)
+                                                                    {
+                                                                        if (Convert.ToBoolean(@item.sub_menu_id == check.sub_menu_id))
+                                                                        {
+                                                                            isChecked = "checked";
+                                                                        }
+                                                                    }
+
+                                                                    if (isChecked == "checked")
+                                                                    {
+                                                                        <input id="cbxPage" type="checkbox" class="cbxMark" checked="@isChecked" onchange="syncSelectAll();" name="@reg" value="@item.sub_menu_id" />
+                                                                        <label for="@reg">@item.title</label>
+                                                                    }
+                                                                    else if (isActive == "disabled")
+                                                                    {
+                                                                        <input id="cbxPage" type="checkbox" class="cbxMark" disabled="@isActive" name="@reg" value="@item.sub_menu_id" />
+                                                                        <label for="@reg">@item.title</label>
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        if (item.url_key != "home" && item.item_id != 3 && item.item_id != 10)
+                                                                        {
+                                                                            <input id="cbxPage" type="checkbox" class="cbxMark" onchange="syncSelectAll();" name="@reg" value="@item.sub_menu_id">
+                                                                            <label for="@reg">@item.title</label>
+                                                                        }
+                                                                    }
+                                                                }
+
+                                                            </div>
+                                                        }
+                                                        else
+                                                        {
+                                                            string reg = @Regex.Replace(@item.title, @"\s+", "");
+                                                            if (item.url_key != "home")
+                                                            {
+                                                                <div class="col-md-6">
+                                                                    <input id="cbxPage" type="checkbox" class="cbxMark" onchange="syncSelectAll();" name="@reg" value="@item.sub_menu_id">
+                                                                    <label for="@reg">@item.title</label>
+                                                                </div>
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    </div>
+                                </fieldset>
+
+                            </div>
+
+
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <div class="modal-footer">
+                <div>
+                    <button id="btnCloseModel" type="button" class="btn btn-warning" onclick="closeModal();">Close</button>
+                    @{
+                        if (ViewBag.Title == "Edit")
+                        {
+                            <button id="btnUpdate" type="button" class="btn btn-primary" name="submit" value="submit" onclick="updateLeftAdImage();">Update & Preview</button>
+                        }
+                        else
+                        {
+                            <button id="btnSave" type="button" class="btn btn-success" name="submit" value="submit" onclick="saveLeftAdImage()">Save & Preview</button>
+                        }
+                    }
+                </div>
+                <div style="display: block; margin-left: auto;">
+                    <button id="btnPublish" type="button" class="btn btn-info" name="submit" value="submit" onclick="publishLeftAdImage();">Publish</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+<script>
+    var formModeCheck = '@ViewBag.Title';
+    var mwidthSize = '@mwidth';
+    var mheightSize = '@mheight';
+    var dwidthSize = '@dwidth';
+    var dheightSize = '@dheight';
+</script>
+

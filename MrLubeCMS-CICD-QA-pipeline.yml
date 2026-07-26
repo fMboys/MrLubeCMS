@@ -1,0 +1,124 @@
+# Build pipeline for MrLubeCMS QA environment
+trigger:
+- QA
+
+name: $(Year:yyyy)-$(Month)-$(DayOfMonth).$(BuildID)-$(SourceBranchName)
+variables:
+  buildPlatform: 'Any CPU'
+  buildConfiguration: 'Release'
+  solution: 'CMSMrLube/MrLubeCMS.sln'
+  project: 'CMSMrLube/MrLubeCMS.csproj'
+  system.debug: true
+
+stages:
+    - stage: stageBuild
+      displayName: 'Build'
+      jobs:
+          - job: build
+            displayName: 'Build & Publish'
+            pool: 
+              QA Pool
+            steps:
+                - task: UseDotNet@2
+                  displayName: 'Installing .NET Core 6.x SDK'
+                  inputs:
+                      version: 6.x
+                      performMultiLevelLookup: true
+                - task: NuGetToolInstaller@1
+                  name: 'nugetToolInstaller'
+                  displayName: 'Nuget Tools Installing'
+                  inputs:
+                   versionSpec: '5.8'
+                - task: NuGetCommand@2
+                  name: 'restore'
+                  displayName: 'Restore project dependencies'
+                  inputs:
+                      command: restore
+                      restoreSolution: '$(project)'
+                      feedsToUse: select
+                - task: DotNetCoreCLI@2
+                  name: 'build'
+                  displayName: 'Build the project - Release'
+                  inputs:
+                   command: build
+                   projects: '**/*.csproj'
+                   arguments: '--configuration $(BuildConfiguration)'
+            # Publish project to specified folder
+                - task: DotNetCoreCLI@2
+                  name: 'publish'
+                  displayName: 'Publish'
+                  inputs:
+                      command: publish
+                      publishWebProjects: true
+                      arguments: '--configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)'
+                      zipAfterPublish: true
+                      modifyOutputPath: true
+                - task: PublishBuildArtifacts@1
+                  name: 'publishBuildArtifacts'
+                  displayName: 'Publishing to drop zip'
+                  inputs:
+                      PathToPublish: '$(Build.ArtifactStagingDirectory)'
+                      ArtifactName: 'drop'
+                      publishLocation: Container
+    - stage: stageDeployQA
+      displayName: 'QA Slot Deployment'
+      dependsOn: stageBuild
+      condition: and(succeeded('stageBuild'), eq(variables['build.sourceBranch'], 'refs/heads/qa'))
+      jobs:
+        - deployment: deployQA
+          displayName: 'Deploying to cmsdev-01-qa'
+          pool: QA Pool
+          environment: qa
+          strategy:
+           runOnce:
+             deploy:
+               steps:
+                - checkout: none
+              # download artifact from previous job
+                - task: DownloadPipelineArtifact@2
+                  displayName: 'Downloading artifact'
+                  inputs:
+                    source: 'current'
+                    artifactName: 'drop'
+                    path: '$(Build.ArtifactStagingDirectory)'
+                - task: AzureWebApp@1
+                  inputs:
+                    azureSubscription: 'sc-sub-dotcom-dev'
+                    appType: 'webApp'
+                    appName: 'cmsdev-01'
+                    deployToSlotOrASE: true
+                    resourceGroupName: 'rg-dev-dotcom'
+                    slotName: 'qa'
+                    package: '$(Build.ArtifactStagingDirectory)/**/*.zip'
+                    deploymentMethod: 'zipDeploy'
+    - stage: stageDeployProd
+      displayName: 'Production Slot Deployment'
+      dependsOn: stageDeployQA
+      condition: succeeded('stageDeployQA')
+      jobs:
+        - deployment: deployProd
+          displayName: 'Deploying to cmsdev-01'
+          pool: QA Pool
+          environment: qa
+          strategy:
+           runOnce:
+             deploy:
+               steps:
+                - checkout: none
+              # download artifact from previous job
+                - task: DownloadPipelineArtifact@2
+                  displayName: 'Downloading artifact'
+                  inputs:
+                    source: 'current'
+                    artifactName: 'drop'
+                    path: '$(Build.ArtifactStagingDirectory)'
+                - task: AzureWebApp@1
+                  inputs:
+                    azureSubscription: 'sc-sub-dotcom-dev'
+                    appType: 'webApp'
+                    appName: 'cmsdev-01'
+                    deployToSlotOrASE: true
+                    resourceGroupName: 'rg-dev-dotcom'
+                    slotName: 'production'
+                    package: '$(Build.ArtifactStagingDirectory)/**/*.zip'
+                    deploymentMethod: 'zipDeploy'

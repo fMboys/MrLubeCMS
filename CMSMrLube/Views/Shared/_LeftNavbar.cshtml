@@ -1,0 +1,239 @@
+﻿@*@inject DefaultHttpContextFactory;*@
+@{
+    var controllerName = @ViewContext.RouteData.Values["controller"].ToString();
+    var textactive = "";
+}
+<div class="app-sidebar sidebar-shadow">
+    <div class="app-header__logo">
+        <div class="logo-src"></div>
+        <div class="header__pane ml-auto">
+            <div>
+                <button type="button" class="hamburger close-sidebar-btn hamburger--elastic" data-class="closed-sidebar">
+                    <span class="hamburger-box">
+                        <span class="hamburger-inner"></span>
+                    </span>
+                </button>
+            </div>
+        </div>
+    </div>
+    <div class="app-header__mobile-menu">
+        <div>
+            <button type="button" class="hamburger hamburger--elastic mobile-toggle-nav">
+                <span class="hamburger-box">
+                    <span class="hamburger-inner"></span>
+                </span>
+            </button>
+        </div>
+    </div>
+    <div class="app-header__menu">
+        <span>
+            <button type="button"
+                    class="btn-icon btn-icon-only btn btn-primary btn-sm mobile-toggle-header-nav">
+                <span class="btn-icon-wrapper">
+                    <i class="fa fa-ellipsis-v fa-w-6"></i>
+                </span>
+            </button>
+        </span>
+    </div>
+    <div class="scrollbar-sidebar">
+        <div class="app-sidebar__inner">
+            <ul class="vertical-nav-menu">
+                <li class="app-sidebar__heading">Mr. Lube CMS Menu</li>
+                @*<li class="mm-active">
+                <a href="@Url.Action("Index", "Home")">
+                <i class="metismenu-icon pe-7s-rocket"></i>
+                Dashboards
+                <i class="metismenu-state-icon pe-7s-angle-down caret-left"></i>
+                </a>
+
+                </li>*@
+                <li>
+                    @{
+                        if (controllerName == "Banner")
+                        {
+                            textactive = "mm-active";
+                                }
+                        else
+                        {
+                            textactive = "";
+                        }
+                    }
+                    <a class="@textactive" href="@Url.Action("Banner", "Banner")">
+                        @*<i class="metismenu-icon pe-7s-browser"></i>*@
+                        @*<i class="lftmnuicn lnr-screen icon-gradient bg-mean-fruit"></i>*@
+                        <span class="leftNavText">Home Page Banners</span>
+                        @*<i class="metismenu-state-icon pe-7s-angle-down caret-left"></i>*@
+                    </a>
+
+                </li>
+                <li>
+                    @{
+                        if (controllerName == "ShopTireAll")
+                        {
+                            textactive = "mm-active";
+                                }
+                        else
+                        {
+                            textactive = "";
+                        }
+                    }
+                    <a class="@textactive" href="@Url.Action("Index", "ShopTireAll")">
+                        @*<i class="metismenu-icon pe-7s-shopbag"></i>*@
+                        @*<i class="lftmnuicn lnr-cog icon-gradient bg-tempting-azure"></i>*@
+                        <span class="leftNavText">Shop Tire Banners - All</span>
+                        @*<i class="metismenu-state-icon pe-7s-angle-down caret-left"></i>*@
+                    </a>
+                </li>
+                <li>
+                    @{
+                        if (controllerName == "ShopTire")
+                        {
+                            textactive = "mm-active";
+                        }
+                        else
+                        {
+                            textactive = "";
+                        }
+                    }
+                    <a class="@textactive" href="@Url.Action("Index", "ShopTire")">
+                        @*<i class="metismenu-icon pe-7s-shopbag"></i>*@
+                        @*<i class="lftmnuicn lnr-cog icon-gradient bg-tempting-azure"></i>*@
+                        <span class="leftNavText">Shop Tire Banners</span>
+                        @*<i class="metismenu-state-icon pe-7s-angle-down caret-left"></i>*@
+                    </a>
+                </li>
+                <li>
+                    @{
+                        if (controllerName == "FloatingImage")
+                        {
+                            textactive = "mm-active";
+                                }
+                        else
+                        {
+                            textactive = "";
+                        }
+                    }
+                    <a class="@textactive" href="@Url.Action("Index", "FloatingImage")">
+                        @*<i class="metismenu-icon pe-7s-plugin"></i>*@
+                        @*<i class="lftmnuicn pe-7s-box2 icon-gradient bg-amy-crisp"></i>*@
+                        <span class="leftNavText">Floating Images</span>
+                        @*<i class="metismenu-state-icon pe-7s-angle-down caret-left"></i>*@
+                    </a>
+
+                </li>
+                <li>
+                    @{
+                        if (controllerName == "LeftAd")
+                        {
+                            textactive = "mm-active";
+                                }
+                        else
+                        {
+                            textactive = "";
+                        }
+                    }
+                    <a class="@textactive" href="@Url.Action("Index", "LeftAd")">
+                        @*<i class="lftmnuicn lnr-magic-wand icon-gradient bg-mixed-hopes"></i>*@
+                        @*<i class="metismenu-icon pe-7s-diamond"></i>*@
+                        <span class="leftNavText">Left Ad Images</span>
+                        @*<i class="metismenu-state-icon pe-7s-angle-down caret-left"></i>*@
+                    </a>
+
+                </li>
+                <li>
+                    @{
+                        if (controllerName == "Promos")
+                        {
+                            textactive = "mm-active";
+                                }
+                        else
+                        {
+                            textactive = "";
+                        }
+                    }
+                    <a class="@textactive" href="@Url.Action("Index", "Promos")">
+                        @*<i class="metismenu-icon pe-7s-shopbag"></i>*@
+                        @*<i class="lftmnuicn lnr-film-play icon-gradient bg-deep-blue"></i>*@
+                        <span class="leftNavText">Promo Pages</span>
+                        @*<i class="metismenu-state-icon pe-7s-angle-down caret-left"></i>*@
+                    </a>
+                </li>
+                <li>
+                    @{
+                        if (controllerName == "PromoImages")
+                        {
+                            textactive = "mm-active";
+                                }
+                        else
+                        {
+                            textactive = "";
+                        }
+                    }
+                    <a class="@textactive" href="@Url.Action("Index", "PromoImages")">
+                        @*<i class="metismenu-icon pe-7s-shopbag"></i>*@
+                        @*<i class="lftmnuicn lnr-camera-video icon-gradient bg-grow-early"></i>*@
+                        <span class="leftNavText">Promo Images</span>
+                        @*<i class="metismenu-state-icon pe-7s-angle-down caret-left"></i>*@
+                    </a>
+                </li>
+                <li>
+                    @{
+                        if (controllerName == "Coupons")
+                        {
+                            textactive = "mm-active";
+                                }
+                        else
+                        {
+                            textactive = "";
+                        }
+                    }
+                    <a class="@textactive" href="@Url.Action("Index", "Coupons")">
+                        @*<i class="metismenu-icon pe-7s-shopbag"></i>*@
+                        <span class="leftNavText">Coupon Pages</span>
+                        @*<i class="lftmnuicn lnr-cloud-download icon-gradient bg-deep-blue" style="margin-left: -122px;"></i>*@
+                        @*<i class="metismenu-state-icon pe-7s-angle-down caret-left"></i>*@
+                    </a>
+                </li>
+                <li>
+                    @{
+                        if (controllerName == "CouponImages")
+                        {
+                            textactive = "mm-active";
+                                }
+                        else
+                        {
+                            textactive = "";
+                        }
+                    }
+                    <a class="@textactive" href="@Url.Action("Index", "CouponImages")">
+                        @*<i class="metismenu-icon pe-7s-shopbag"></i>*@
+                        <span class="leftNavText">Coupon Images</span>
+                        @*<i class="lftmnuicn lnr-dice icon-gradient bg-deep-blue" style="margin-left: -132px;"></i>*@
+                        @*<i class="metismenu-state-icon pe-7s-angle-down caret-left"></i>*@
+                    </a>
+                </li>
+                <li>
+                    @{
+                        if (controllerName == "PublishAll")
+                        {
+                            textactive = "mm-active";
+                                }
+                        else
+                        {
+                            textactive = "";
+                        }
+                    }
+                    <a class="@textactive" href="@Url.Action("Publish", "PublishAll")">
+                        @*<i class="metismenu-icon pe-7s-back-2"></i>*@
+                        @*<i class="lftmnuicn lnr-database icon-gradient bg-night-fade"></i>*@
+                        <span class="leftNavText">Publish All</span>
+                        @*<i class="metismenu-state-icon pe-7s-angle-down caret-left"></i>*@
+                    </a>
+                </li>
+                <!-- <li class="app-sidebar__heading">UI Components</li> -->
+                <!-- <li class="app-sidebar__heading">Dashboard Widgets</li> -->
+
+            </ul>
+        </div>
+    </div>
+</div>

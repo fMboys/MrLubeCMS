@@ -1,0 +1,113 @@
+﻿@model CMS.Core.Entities.CouponPages;
+@using static IWebHostEnvironment;
+@using Microsoft.Extensions.Configuration;
+@inject IConfiguration Configuration;
+@{
+    //var image = TempData["mainImage"];
+    Layout = null;
+}
+
+<div class="modal-dialog" role="document">
+    <div class="modal-content">
+        <form asp-action="SaveCoupon" id="formCoupon" method="post" enctype="multipart/form-data">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalCMSLabel">@ViewBag.Title Coupon Page</h5>
+                <button type="button" class="close" data-bs-dismiss="modal" aria-hidden="true" onclick="closeModal();">&times;</button>
+            </div>
+            <div class="modal-body">
+                @{
+                    <input for="@ViewBag.Title" type="hidden" id="formMode" name="formMode" class="form-control-file" value="@ViewBag.Title" />
+                    <input asp-for="@Model.itemId" type="hidden" id="itemId" name="itemId" class="form-control-file" value="@Model.itemId" />
+                    <input asp-for="@Model.guid" type="hidden" id="guid" name="guid" class="form-control-file" value="@Model.guid" />
+                    <input id="hdnStaggingDomain" type="hidden" value="@Configuration["StagingDomain"]" />
+                    <input id="hdnProdDomain" type="hidden" value="@Configuration["ProdDomain"]" />
+                    <input id="hdnurl_Key" type="hidden" value="@Model.url_Key" />
+                }
+                <div class="row">
+                    <div class="form-group col-md-6">
+                        <label asp-for="@Model.title" class="form-label mb-1 text-3">English Title</label>
+                        <div class="position-relative">
+                            <i class="fa fa-pen text-color-primary text-3 position-absolute" style="padding: 12px 5px 0px 10px;"></i>
+                            <input asp-for="@Model.title" name="englishTitle" id="englishTitle" placeholder="English Title" type="text" class="form-control" style="padding-left:45px;" aria-describedby="englishTitle-error" />
+                            <em id="englishTitle-error" class="error invalid-feedback">Please enter English Title</em>
+                        </div>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label asp-for="@Model.frenchTitle" class="form-label mb-1 text-3">French Title</label>
+                        <div class="position-relative">
+                            <i class="fa fa-pen text-color-primary text-3 position-absolute" style="padding: 12px 5px 0px 10px;"></i>
+                            <input asp-for="@Model.frenchTitle" name="frenchTitle" id="frenchTitle" placeholder="French Title" type="text" class="form-control" style="padding-left:45px;" aria-describedby="frenchTitle-error" />
+                            <em id="frenchTitle-error" class="error invalid-feedback">Please enter French Title</em>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="form-group col-md-6">
+                        <label asp-for="@Model.date_expired" class="form-label mb-1 text-3">Date Expired</label>
+                        <div class="position-relative">
+                            <i class="fa fa-pen text-color-primary text-3 position-absolute" style="padding: 12px 5px 0px 10px;"></i>
+                            <input asp-for="@Model.date_expired" name="date_expired" id="date_expired" placeholder="Date Expired" type="date" class="form-control" style="padding-left:45px;" aria-describedby="date_expired-error" />
+                            <em id="date_expired-error" class="error invalid-feedback">Please Enter Date Expired</em>
+                        </div>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <div class="position-relative form-group">
+                            <label asp-for="@Model.status" class="form-label mb-1 text-2">Select Status</label>
+                            <select asp-for="@Model.status" name="imageStatus" id="imageStatus" class="form-control">
+                                <option>Active</option>
+                                <option>Inactive</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row" id="dvPromoUrls">
+                    <div class="form-group col-md-6">
+                        <label class="form-label mb-1 text-3">Staging EN-Url</label>
+                        <div class="position-relative">
+                            <a id="dvStagingPromoUrl" target="_blank" href="" style="cursor:pointer"></a>
+                        </div>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label class="form-label mb-1 text-3">Production EN-Url</label>
+                        <div class="position-relative">
+                            <a id="dvProductionPromoUrl" target="_blank" href="" style="cursor:pointer"></a>
+                        </div>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label class="form-label mb-1 text-3">Staging FR-Url</label>
+                        <div class="position-relative">
+                            <a id="dvStagingPromoFrUrl" target="_blank" href="" style="cursor:pointer"></a>
+                        </div>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label class="form-label mb-1 text-3">Production FR-Url</label>
+                        <div class="position-relative">
+                            <a id="dvProductionPromoFrUrl" target="_blank" href="" style="cursor:pointer"></a>
+                        </div>
+                    </div>
+                </div>
+
+
+            </div>
+            <div class="modal-footer">
+                <div>
+                    <button id="btnCloseModel" type="button" class="btn btn-warning" onclick="closeModal();">Close</button>
+                    @{
+                        if (ViewBag.Title == "Edit")
+                        {
+                            <button id="btnUpdate" type="button" class="btn btn-primary" name="submit" value="submit" onclick="updateCoupon();">Update & Preview</button>
+                        }
+                        else
+                        {
+                            <button id="btnSave" type="button" class="btn btn-success" name="submit" value="submit" onclick="saveCoupon()">Save & Preview</button>
+                        }
+                    }
+                </div>
+                <div style="display: block; margin-left: auto;">
+                    <button id="btnPublish" type="button" class="btn btn-info" name="submit" value="submit" onclick="publishCoupon();">Publish</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

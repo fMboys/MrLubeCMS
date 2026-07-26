@@ -1,0 +1,91 @@
+﻿@model CMS.Core.DTOs.CouponImagesDto
+@inject IConfiguration _configuration;
+@{
+    var AzureBlob = _configuration.GetSection("AzureBlob").Value;
+    var bannerpath = "/img/coupons/";
+    ViewBag.Title = "View";
+    Layout = null;
+    var serverTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Eastern Standard Time");
+    DateTime dt1 = TimeZoneInfo.ConvertTimeFromUtc(Model.CreatedDate.Value,TimeZoneInfo.Local);
+    string dFormat = dt1.ToString("dd MMM yyyy HH:mm:ss");
+}
+
+<div class="modal-dialog modal-lg">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h4 class="modal-title" id="modalCMSLabel">Coupon Image Details</h4>
+            @*<button type="button" class="close" data-bs-dismiss="modal" aria-label="Close" aria-hidden="true">&times;</button>*@
+            <button id="btnCloseDetail" data-dismiss="modal" type="button" class="close" aria-label="Close" aria-hidden="true" onclick="closeModal();">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        <div class="modal-body">
+
+            <div class="row" style="border-bottom: 1px solid grey;">
+                @*<img src="~/assets/images/logo-full.png" style="width:100%; height:100%"/>*@
+                @*<label class="col-md-2 col-form-label form-control-label" style="font-weight:600; background-color: #f8f9fa; border-bottom: 1px solid grey;">Image Name:</label>*@
+                <label class="col-lg-3 pt-3 pb-2" style="margin-bottom: 0px; font-weight:600; background-color:#e8e6e3; "><i class="fas fa-id-badge" style="width:20%;"></i><span style=width:25%>Coupon Image ID:</span></label>
+                <label class="col-lg-2 pt-3 pb-2" style="margin-bottom: 0px; font-weight:500; background-color: #f8f9fa;">@Model.CouponImageId</label>
+                <label for="@Model.ImageName" class="col-lg-3" style="word-wrap: break-word; margin-bottom: 0px; font-weight:500; background-color: #f8f9fa;"></label>
+                @{
+                    @if (@Model.ViewDevice == "desktop")
+                    {
+                        var img = AzureBlob + bannerpath + @Model.ImageName;
+                        <div class="col-md-4" style="display:block; text-align:center;background-color: #f8f9fa;">
+                            <img src="@Url.Content(img)" style="height:80%; width:100%; padding-top: 0px; padding-left: 0px; background-color: #f8f9fa; border-bottom: " asp-append-version="true" />
+                        </div>
+                    }
+                    else
+                    {
+                        var img = AzureBlob + bannerpath + @Model.ImageName;
+                        <div class="col-md-4" style="display:block; text-align:center;background-color: #f8f9fa;">
+                            <img src="@Url.Content(img)" style="height:95%; width:80%; padding-top: 0px; padding-left: 0px; background-color: #f8f9fa; " asp-append-version="true" />
+                        </div>
+                    }
+                }
+                @*<img src="@Url.Content("~/" + @Model.ImageName)" class="col-md-4" height="80" width="140" style="padding-top: 0px; padding-left: 0px; background-color: #f8f9fa; border-bottom: 1px solid grey;" asp-append-version="true" />*@
+            </div>
+
+            <div class="row">
+                <label class="col-lg-3 pt-3 pb-2" style="margin-bottom: 0px; font-weight:600; background-color:#e8e6e3; border-bottom: 1px solid grey;"><i class="fa fa-language" style="width:20%;"></i><span style=width:25%>Language:</span></label>
+                <label class="col-lg-3 pt-3 pb-2" style="margin-bottom: 0px; font-weight:500; background-color: #f8f9fa; border-bottom: 1px solid grey;">@Model.Language</label>
+                <label class="col-lg-3 pt-3 pb-2" style="margin-bottom: 0px; font-weight:600; background-color:#e8e6e3; border-bottom: 1px solid grey;"><i class="fa fa-pen" style="width:20%;"></i><span style=width:25%>Title:</span></label>
+                <label class="col-lg-3 pt-3 pb-2" style="word-wrap: break-word; margin-bottom: 0px; font-weight:500; background-color: #f8f9fa; border-bottom: 1px solid grey;">@Model.Title</label>
+            </div>
+            <div class="row">
+               
+                <label class="col-lg-3 pt-3 pb-2" style="margin-bottom: 0px; font-weight:600; background-color: #e8e6e3; border-bottom: 1px solid grey;"><i class="fas fa-file-image" style="width:20%;"></i><span style=width:25%>Image Name:</span></label>
+                <label class="col-lg-3 pt-3 pb-2" style="word-wrap: break-word; margin-bottom: 0px; font-weight:500; background-color: #f8f9fa; border-bottom: 1px solid grey;">@Model.ImageName</label>
+                <label class="col-lg-3 pt-3 pb-2" style="margin-bottom: 0px; font-weight:600; background-color:#e8e6e3; border-bottom: 1px solid grey;"><i class="fa fa-info" style="width:20%;"></i><span style=width:25%>Image Status:</span></label>
+                <label class="col-lg-3 pt-3 pb-2" style="margin-bottom: 0px; font-weight:500; background-color: #f8f9fa; border-bottom: 1px solid grey;">@Model.ImageStatus</label>
+            </div>
+
+            <div class="row">
+                
+                <label class="col-lg-3 pt-3 pb-2" style="margin-bottom: 0px; font-weight:600; background-color: #e8e6e3; border-bottom: 1px solid grey;"><i class="fa fa-tablet" style="width:20%;"></i><span style=width:25%>View Device:</span></label>
+                <label class="col-lg-3 pt-3 pb-2" style="margin-bottom: 0px; font-weight:500; background-color: #f8f9fa; border-bottom: 1px solid grey;">@Model.ViewDevice</label>
+                <label class="col-lg-3 pt-3 pb-2" style="margin-bottom: 0px; font-weight:600; background-color:#e8e6e3; border-bottom: 1px solid grey;"><i class="fa fa-user" style="width:20%;"></i><span style=width:25%>Last User:</span></label>
+                <label class="col-lg-3 pt-3 pb-2" style="margin-bottom: 0px; font-weight:500; background-color: #f8f9fa; border-bottom: 1px solid grey;">@Model.LastUser</label>
+            </div>
+            <div class="row">
+                
+                @*<label class="col-lg-2 pt-3 pb-2" style="margin-bottom: 0px; font-weight:600; background-color: #e8e6e3; border-bottom: 1px solid grey;"><i class="fas fa-link" style="padding-right:5px;"></i>HyperLink</label>
+                <label class="col-lg-4 pt-3 pb-2" style="word-wrap: break-word; margin-bottom: 0px; font-weight:500; background-color: #f8f9fa; border-bottom: 1px solid grey;">@Model.Hyperlink</label>*@
+                <label class="col-lg-3 pt-3 pb-2" style="font-weight:600; padding-left: 15px;margin-bottom: 0px; background-color:#e8e6e3; border-bottom: 1px solid grey;"><i class="fa fa-calendar" style="width:20%;"></i><span style=width:25%>Created Date:</span></label>
+                <label class="col-lg-3 pt-3 pb-2" style="font-weight:500; background-color: #f8f9fa;margin-bottom: 0px; border-bottom: 1px solid grey;">@TimeZoneInfo.ConvertTimeToUtc(Model.CreatedDate.Value,serverTimeZone).ToString("dd MMM yyyy HH:mm:ss")</label>
+                <label class="col-lg-3 pt-3 pb-2" style="font-weight:600; padding-left: 15px;margin-bottom: 0px; background-color: #e8e6e3; border-bottom: 1px solid grey;"><i class="fa fa-calendar" style="width:20%;"></i><span style=width:25%>Update Date:</span></label>
+                <label class="col-lg-3 pt-3 pb-2" style="font-weight:500;margin-bottom: 0px; background-color: #f8f9fa; border-bottom: 1px solid grey;">@TimeZoneInfo.ConvertTimeToUtc(Model.UpdatedDate.Value,serverTimeZone).ToString("dd MMM yyyy HH:mm:ss")</label>
+            </div>
+            @*<div class="row">
+                
+                
+            </div>*@
+            @*
+            <div class="form-group view-label row">
+            <label class="col-lg-2 col-form-label form-control-label line-height-9 pt-2 text-2 leftbg">@FormLabels.Contactnumber:</label>
+            <label class="col-lg-4 col-form-label form-control-label line-height-9 pt-2 text-2">@Model.AreaPhone_View</label>
+            </div>*@
+        </div>
+    </div>
+
+</div>

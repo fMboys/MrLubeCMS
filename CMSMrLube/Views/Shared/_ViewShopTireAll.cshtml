@@ -1,0 +1,242 @@
+﻿@model CMS.Core.Entities.ShopTire;
+@inject IConfiguration _configuration;
+@using static IWebHostEnvironment
+@{
+    var AzureBlob = _configuration.GetSection("AzureBlob").Value;
+    var bannerpath = "/img/ShopTires/";
+    var image = TempData["mainImage"];
+    var mwidth = ViewBag.mwidth;
+    var mheight = ViewBag.mheight;
+    var dwidth = ViewBag.dwidth;
+    var dheight = ViewBag.dheight;
+    //var storeLsit = @Model.SelectedStores;
+    Layout = null;
+}
+@*<link href="~/css/chosen.min.css" rel="stylesheet" />*@
+@*<link rel="stylesheet" href="~/css/chosen.css">*@
+
+<div class="modal-dialog" role="document">
+    <div class="modal-content">
+        <form asp-action="SaveShopTire" id="formShopTire" method="post" enctype="multipart/form-data">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalCMSLabel">@ViewBag.Title Shop Tire Banner - All</h5>
+                <button type="button" class="close" data-bs-dismiss="modal" aria-hidden="true" onclick="closeModal();">&times;</button>
+            </div>
+            <div class="modal-body">
+                @{
+                    <input id="hdnStaggingDomain" type="hidden" value="@_configuration["StagingDomain"]" />
+                    <input id="hdnProdDomain" type="hidden" value="@_configuration["ProdDomain"]" />
+                }
+                <div class="row">
+                    <div class="col-md-6">
+                        @{
+                            @if (@Model.image != null)
+                            {
+                                if (@Model.view == "desktop")
+                                {
+                                    <div style="display:block; margin-bottom:5px;text-align:center;">
+                                        <img src="@Url.Content(AzureBlob + bannerpath + @Model.image)" class="" style="height:90px; width:100%;" asp-append-version="true" />
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div style="display:block; margin-bottom:5px;text-align:center;">
+                                        <img src="@Url.Content(AzureBlob + bannerpath + @Model.image)" class="" style="height:90%; width:30%;" asp-append-version="true" />
+                                    </div>
+                                }
+
+                            }
+                        }
+                    </div>
+
+                    <div class="col-md-6">
+                        @{
+                            if (ViewBag.Title == "Edit")
+                            {
+                                <label for="@Model.image" style="margin-left: 10px; ">@Model.image</label>
+                                //<input for="@Model.image" type="text" name="imageFileName" class="form-control" value="@Model.image" disabled style="margin-top: 5px; margin-bottom: 5px;" />
+                            }
+                            <input asp-for="@Model.guid" type="hidden" name="img_guid" id="img_guid" class="form-control-file" value="@Model.guid">
+                            <input for="@ViewBag.Title" type="hidden" id="formMode" name="formMode" class="form-control-file" value="@ViewBag.Title" />
+                            <input for="@Model.image" type="hidden" id="imageUpload" name="imageUpload" class="form-control-file" value="@Model.image" />
+                            <input asp-for="@Model.shopTire_id" type="hidden" id="shopTireID" name="shopTireID" class="form-control-file" value="@Model.shopTire_id" />
+                        }
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="form-group col-md-6">
+                        <div class="position-relative form-group">
+                            <label asp-for="@Model.view" class="form-label mb-1 text-2">Select View Device</label>
+                            <select asp-for="@Model.view" name="viewDevice" id="viewDevice" class="form-control" readonly onchange="toggleHintText();">
+                                @{
+                                    if (ViewBag.Title == "Edit")
+                                    {
+                                        if (Model.view == "desktop")
+                                        {
+                                            <option selected>Desktop</option>
+                                            @*<option>Mobile</option>*@
+                                        }
+                                        else if (Model.view == "mobile")
+                                        {
+                                            <option selected>Mobile</option>
+                                            //<option>Desktop</option>
+                                        }
+
+
+                                    }
+                                    else
+                                    {
+
+                                        @if (ViewBag.views == "desktop")
+                                        {
+                                            <option selected>Desktop</option>
+                                        }
+                                        else if (ViewBag.views == "mobile")
+                                        {
+                                            <option selected>Mobile</option>
+                                        }
+
+                                    }
+                                }
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="position-relative form-group col-md-6">
+
+                        <label for="shopTireFile">Upload ShopTire Image File</label>
+                        <div class="col-md-7">
+                            <input asp-for="@Model.image" type="file" accept="*/*" name="imageFile" id="imageFile" class="form-control-file" value="" onchange="validateFileResolution(this,event);" onclick="FileOnClick(event);" />
+                        </div>
+                        @{
+                            if (Model.view == "desktop")
+                            {
+                                <small class="form-text text-muted" id="txtImageHint">Please select an image of Resolution @dwidth px x @dheight px.</small>
+                            }
+                            else if (Model.view == "mobile")
+                            {
+                                <small class="form-text text-muted" id="txtImageHint">Please select an image of Resolution @mwidth px x @mheight px.</small>
+                            }
+                            else
+                            {
+                                @if (ViewBag.views == "desktop")
+                                {
+                                    <small class="form-text text-muted" id="txtImageHint">Please select an image of Resolution @dwidth px x @dheight px.</small>
+                                }
+                                else if (ViewBag.views == "mobile")
+                                {
+                                    <small class="form-text text-muted" id="txtImageHint">Please select an image of Resolution @mwidth px x @mheight px.</small>
+                                }
+                            }
+                        }
+                    </div>
+
+                </div>
+                <div class="row">
+                    @*<div class=" col-md-6">
+                        <label asp-for="@Model.store_num">Store Number</label>
+                        <div class="position-relative " id="multiselectchoosen">
+                           
+                            <em id="storeNumError" class="error invalid-feedback">Enter store number for ShopTire.</em>
+                        </div>
+                    </div>*@
+                    <div class="form-group col-md-6">
+                        <label asp-for="@Model.title" class="form-label mb-1 text-3">Store Title</label>
+                        <div class="position-relative">
+                            <i class="fa fa-pen text-color-primary text-3 position-absolute" style="padding: 12px 5px 0px 10px;"></i>
+                            @*@Html.TextBoxFor(x => x.title, new { @class="form-control text-3 h-auto px-5"})*@
+                            <input asp-for="@Model.title" name="storeTitle" id="storeTitle" placeholder="Store Title" type="text" class="form-control" style="padding-left:45px;" aria-describedby="storeTitle-error" />
+                            @*<span asp-validation-for="@Model.title" class="text-danger"></span>*@
+                            <em id="storeTitle-error" class="error invalid-feedback">Enter Title for Store.</em>
+                        </div>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label asp-for="@Model.ad_hyperlink" class="form-label mb-1 text-2">Image HyperLink</label>
+                        <div class="position-relative">
+                            <i class="fas fa-link text-color-primary text-3 position-absolute" style="padding: 12px 5px 0px 10px;"></i>
+                            <input asp-for="@Model.ad_hyperlink" name="imageHyperLink" id="imageHyperLink" placeholder="HyperLink" type="text" class="form-control" style="padding-left:45px;" aria-describedby="imageHyperLinkError" />
+                            @*<span asp-validation-for="@Model.ad_hyperlink" class="text-danger"></span>*@
+                            <em id="imageHyperLinkError" class="error invalid-feedback">Enter hyperlink for image.</em>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+
+                    <div class="form-group col-md-6">
+                        <div class="position-relative form-group">
+                            <label asp-for="@Model.language_id" class="form-label mb-1 text-2">Choose your preferred language</label>
+                            <select asp-for="@Model.language_id" name="language" id="language" readonly class="form-control">
+                                @{
+                                    if (Model.language_id != 0)
+                                    {
+                                        if (Model.language_id == 1)
+                                        {
+                                            <option selected>English</option>
+                                            //<option>French</option>
+                                        }
+                                        else if (Model.language_id == 2)
+                                        {
+                                            <option selected>French</option>
+                                            //<option>English</option>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        @if (ViewBag.lang == 1)
+                                        {
+                                            <option selected>English</option>
+                                        }
+                                        else if (ViewBag.lang == 2)
+                                        {
+                                            <option selected>French</option>
+                                        }
+                                    }
+                                }
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <div>
+                    <button id="btnCloseModel" type="button" class="btn btn-warning" onclick="closeModal();">Close</button>
+                    @{
+                        if (ViewBag.Title == "Edit")
+                        {
+                            <button id="btnUpdate" type="button" class="btn btn-primary" name="submit" value="submit" onclick="updateShopTireAll();">Update & Preview</button>
+                        }
+                        else
+                        {
+                            <button id="btnSave" type="button" class="btn btn-success" name="submit" value="submit" onclick="saveShopTire()">Save & Preview</button>
+                        }
+                    }
+                </div>
+                <div style="display: block; margin-left: auto;">
+                    <button id="btnPublish" type="button" class="btn btn-info" name="submit" value="submit" onclick="publishShopTire();">Publish</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    var formModeCheck = '@ViewBag.Title';
+    var mwidthSize = '@mwidth';
+    var mheightSize = '@mheight';
+    var dwidthSize = '@dwidth';
+    var dheightSize = '@dheight';
+        //var storeViewbag = 'storeLsit';
+</script>
+@*<script type="text/javascript">
+    $(document).ready(function () {
+        choosen();
+
+
+    });
+</script>*@
+@*<script src="~/assets/js/chosen.jquery.min.js" ></script>*@
+@*<script src="../assets/js/chosen.jquery.js"></script>*@
+@*<script src="../assets/js/chosen.proto.js"></script>*@
+@*<script src="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.11.0/js/standalone/selectize.js"></script>*@
+
