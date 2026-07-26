@@ -10,7 +10,6 @@
 *.userosscache
 *.sln.docstates
 *.env
-appsettings.json
 
 appsettings.json
 
